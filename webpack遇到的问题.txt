@@ -1,0 +1,14 @@
+1、jsx中如果有img标签引用了图片，如果使用路径来加载图片，图片是不会被打包的
+比如<img src="./images/a.jpg"/>这种不会打包
+要这样写<img src={require（"./images/a.jpg"）}/>
+
+或者 import a from “./images/a.jpg”
+<img src={a}/>
+
+为了防止每次使用图片都要import该图片，可以单独创建一个文件，比如convert.js
+import a from “./images/a.jpg”//注意第一个引入没有大括号，后面有大括号
+export {a}
+
+然后
+import a from “convert.js”
+<img src={a}/>
