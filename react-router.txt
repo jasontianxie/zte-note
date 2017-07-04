@@ -1,0 +1,12 @@
+动态路由：
+https://github.com/ReactTraining/react-router/blob/v3/docs/guides/DynamicRouting.md
+
+https://segmentfault.com/a/1190000007141049
+
+http://www.tuicool.com/articles/7FrQziY
+
+
+
+用onenter作验证
+http://www.ruanyifeng.com/blog/2016/05/react_router.html
+
