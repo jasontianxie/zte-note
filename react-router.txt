@@ -1,12 +1,19 @@
-��̬·�ɣ�
+动态路由（按需加载）：
 https://github.com/ReactTraining/react-router/blob/v3/docs/guides/DynamicRouting.md
 
 https://segmentfault.com/a/1190000007141049
 
 http://www.tuicool.com/articles/7FrQziY
 
+如果最后没有按需加载，还是只生成了一个大的js，那么一定是在生成的时候又引用了的那些需要按需加载的模块。
 
 
-��onenter����֤
+
+用onenter作验证
 http://www.ruanyifeng.com/blog/2016/05/react_router.html
+
+还有更多方法如onchange等，看文档：https://github.com/ReactTraining/react-router/blob/v3/docs/API.md#configuration-components
+
+
+
 
