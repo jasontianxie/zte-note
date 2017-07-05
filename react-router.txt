@@ -12,8 +12,10 @@ http://www.tuicool.com/articles/7FrQziY
 用onenter作验证
 http://www.ruanyifeng.com/blog/2016/05/react_router.html
 
+注意：onEnter函数在2.x版本只接受两个参数（nextstate，replace）：https://github.com/ReactTraining/react-router/blob/v2.8.1/docs/guides/RouteConfiguration.md
+而3.x版本可以接受三个参数（nextstate，replace，callback）：https://github.com/ReactTraining/react-router/blob/v3/docs/API.md
+如果在2.x版本中传入三个参数会出错。
+
 还有更多方法如onchange等，看文档：https://github.com/ReactTraining/react-router/blob/v3/docs/API.md#configuration-components
-
-
 
 
