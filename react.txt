@@ -1,0 +1,27 @@
+react事件
+
+除了onClick事件，react还支持哪些事件？
+1、在jsx中写
+其实大部分的dom事件，react都是支持的，只不过都要使用驼峰命名
+具体看官网：https://facebook.github.io/react/docs/handling-events.html
+有哪些常用事件呢：http://www.cnblogs.com/mabylove/p/6873506.html
+
+2、用dom的事件绑定方法
+请在componentDidMount方法中绑定事件 componentWillUnmount方法中解绑事件。React通过ref拿到原始DOM通过addEventListener的方法监听事件
+
+
+enter发送消息，ctrl+enter换行
+
+<textarea placeholder="我想说....." ref="input" onKeyDown={
+                                (e)=>{
+                                    if(e.keyCode==13&&e.ctrlKey) {
+                                        this.refs.input.value=this.refs.input.value+'\r\n'
+                                    }
+                                    if(e.keyCode==13&&!e.ctrlKey){
+                                        e.preventDefault();
+                                        console.log("send message");
+                                    }
+                                }
+                            }></textarea>
+
+
