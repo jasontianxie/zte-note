@@ -1,0 +1,52 @@
+mapStateToProps 函数里面的state是全局state，就是总state
+
+而每个组件的reducer函数得到的state是自己state，就是子state
+
+
+
+
+更新state的时候，一定不要直接操作state，否则页面不会刷新
+
+
+之前这样写的：
+export function chatWindow(state={friendList:[]},action) {
+    switch (action.type) {
+        case 'FRIEND_ADD_ACTION':
+            state.friendList.push(action.payload);
+            return Object.assign({},state,{friendList:state.friendList});
+        default: return state;
+    }
+}
+上面的代码问题就在state.friendList.push(action.payload);这行代码是在直接操作state，所以会导致页面不更新
+
+
+改成如下写法：
+import {deepCopy} from '../utility';
+
+export function chatWindow(state={friendList:[]},action) {
+    switch (action.type) {
+        case 'FRIEND_ADD_ACTION':
+            let stateCopy = deepCopy(state);
+            stateCopy.friendList.push(action.payload);
+            return Object.assign({},state,{friendList:stateCopy.friendList});
+        default: return state;
+    }
+}
+上面代码中的deepCopy是对象深复制，没有操作原来的state，所以更新成功。
+
+
+用redux中间件可以处理异步请求也可以在mapDispatchToProps写啊，有什么区别。
+比如按照阮一峰redux教程，用redux-thunk中间件处理异步
+
+而在mapDispatchToProps中可以这样写啊：
+const mapDispatchToProps = (
+    dispatch,
+    ownProps
+) => {
+    return {
+        addFriendClick: (params) => {
+		fetch（‘a.json’）.then(dispatch({type:"LOGIN",payload:"payload"}))
+            
+        }
+    };
+}
