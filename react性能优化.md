@@ -5,3 +5,5 @@ http://www.cocoachina.com/webapp/20150902/13316.html
 3、shouldComponentUpdate的mixin----pureRenderMixin
 4、shouldComponentUpdate的问题可以用深拷贝来解决（loadash 中提供了深拷贝函数）loadash：https://lodash.com/docs#cloneDeep
 5、深拷贝也有自己的性能问题，用immutable.js来解决
+6、将immutable加入工程中：http://react-china.org/t/react-redux-immutablejs/9948
+https://github.com/camsong/blog/issues/3
