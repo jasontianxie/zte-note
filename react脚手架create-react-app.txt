@@ -2,12 +2,26 @@
 
 package.json文件
 
-scripts字段：
+一、scripts字段：
 npm-run-all：安装 npm install --save npm-run-all
 作用：可以同时执行多条npm run命令，该例子中同时执行了npm run watch-css和npm run start-js。参数-p表示parallel，同时运行几个命令。-s表示sequential命令串行执行。也可以使用两个&运行多个命令：npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive或者npm run build-css && react-scripts build
 
-react-scripts：该脚手架的命令 安装：npm install --save react-scripts
-node_modules--》react-scripts--》bin（bin的作用就是让nodejs命令可以全局执行，看有道笔记）--》react-scripts--》（cross-spawn是一个跨平台的node spawn工具）--》scripts--》start.js--》react-dev-utils工具包--》config--》webpack.config.dev.js
+二、react-scripts：该脚手架的命令 安装：npm install --save react-scripts
+1、node_modules--》
+2、react-scripts--》
+3、bin（bin的作用就是让nodejs命令可以全局执行，看有道笔记）--》
+4、react-scripts（process.argv得到的是一个数组。该数组的第一个成员是“node”，第二个成员是nodejs执行的文件名，剩下的成员就是传入到要执行的js文件中的参数。比如说：node argv.js tom 1992 24 这个命令，console一下process.argv得到的是
+[ 'D:\\nodejs\\node.exe',
+  'E:\\node\\argv',
+  'js',
+  'tom',
+  '1992',
+  '24' ]。即使用了第3步中的bin设置js全局执行，process.argv也是一样的结果）--》
+5、（cross-spawn是一个跨平台的node spawn工具）--》
+6、scripts--》start.js--》
+7、react-dev-utils工具包--》
+8、config--》
+9、webpack.config.dev.js
 
 node-sass-chokidar：安装 npm install --save node-sass-chokidar
 npmjs地址：https://www.npmjs.com/package/node-sass-chokidar
