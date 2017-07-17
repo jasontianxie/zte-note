@@ -1,14 +1,14 @@
-½ÅÊÖ¼ÜµØÖ·£ºhttps://github.com/facebookincubator/create-react-app
+è„šæ‰‹æ¶åœ°å€ï¼šhttps://github.com/facebookincubator/create-react-app
 
-package.jsonÎÄ¼ş
+package.jsonæ–‡ä»¶
 
-scripts×Ö¶Î£º
-npm-run-all£º°²×° npm install --save npm-run-all
-×÷ÓÃ£º¿ÉÒÔÍ¬Ê±Ö´ĞĞ¶àÌõnpm runÃüÁî£¬¸ÃÀı×ÓÖĞÍ¬Ê±Ö´ĞĞÁËnpm run watch-cssºÍnpm run start-js¡£²ÎÊı-p±íÊ¾parallel£¬Í¬Ê±ÔËĞĞ¼¸¸öÃüÁî¡£-s±íÊ¾sequentialÃüÁî´®ĞĞÖ´ĞĞ¡£
+scriptså­—æ®µï¼š
+npm-run-allï¼šå®‰è£… npm install --save npm-run-all
+ä½œç”¨ï¼šå¯ä»¥åŒæ—¶æ‰§è¡Œå¤šæ¡npm runå‘½ä»¤ï¼Œè¯¥ä¾‹å­ä¸­åŒæ—¶æ‰§è¡Œäº†npm run watch-csså’Œnpm run start-jsã€‚å‚æ•°-pè¡¨ç¤ºparallelï¼ŒåŒæ—¶è¿è¡Œå‡ ä¸ªå‘½ä»¤ã€‚-sè¡¨ç¤ºsequentialå‘½ä»¤ä¸²è¡Œæ‰§è¡Œã€‚ä¹Ÿå¯ä»¥ä½¿ç”¨ä¸¤ä¸ª&è¿è¡Œå¤šä¸ªå‘½ä»¤ï¼šnpm run build-css && node-sass-chokidar src/ -o src/ --watch --recursiveæˆ–è€…npm run build-css && react-scripts build
 
-react-scripts£º¸Ã½ÅÊÖ¼ÜµÄÃüÁî °²×°£ºnpm install --save react-scripts
-node_modules--¡·react-scripts--¡·bin--¡·react-scripts--¡·£¨cross-spawnÊÇÒ»¸ö¿çÆ½Ì¨µÄnode spawn¹¤¾ß£©--¡·scripts--¡·start.js--¡·react-dev-utils¹¤¾ß°ü--¡·config--¡·webpack.config.dev.js
+react-scriptsï¼šè¯¥è„šæ‰‹æ¶çš„å‘½ä»¤ å®‰è£…ï¼šnpm install --save react-scripts
+node_modules--ã€‹react-scripts--ã€‹bin--ã€‹react-scripts--ã€‹ï¼ˆcross-spawnæ˜¯ä¸€ä¸ªè·¨å¹³å°çš„node spawnå·¥å…·ï¼‰--ã€‹scripts--ã€‹start.js--ã€‹react-dev-utilså·¥å…·åŒ…--ã€‹config--ã€‹webpack.config.dev.js
 
-node-sass-chokidar£º°²×° npm install --save node-sass-chokidar
-npmjsµØÖ·£ºhttps://www.npmjs.com/package/node-sass-chokidar
-Õâ¸ö°üÊµ¼ÊÉÏÊÇ¶Ônode-sassµÄÓÅ»¯£¨node-sass£ºhttps://www.npmjs.com/package/node-sass£©¡£node-sassµÄ×÷ÓÃÊÇÓÃnodejs±àÒësassÎÄ¼ş³ÉCSS¡£µ«ÊÇnode-sassÓĞÒ»Ğ©ÎÊÌâ£ºhttps://github.com/paulmillr/chokidar
+node-sass-chokidarï¼šå®‰è£… npm install --save node-sass-chokidar
+npmjsåœ°å€ï¼šhttps://www.npmjs.com/package/node-sass-chokidar
+è¿™ä¸ªåŒ…å®é™…ä¸Šæ˜¯å¯¹node-sassçš„ä¼˜åŒ–ï¼ˆnode-sassï¼šhttps://www.npmjs.com/package/node-sassï¼‰ã€‚node-sassçš„ä½œç”¨æ˜¯ç”¨nodejsç¼–è¯‘sassæ–‡ä»¶æˆCSSã€‚ä½†æ˜¯node-sassæœ‰ä¸€äº›é—®é¢˜ï¼šhttps://github.com/paulmillr/chokidar
