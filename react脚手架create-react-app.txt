@@ -21,7 +21,10 @@ npm-run-all：安装 npm install --save npm-run-all
     5.2、spawn用于生成子进程。http://nodejs.cn/api/child_process.html
     5.3、父进程和子进程之间的通信，参考javascript高级程序设计第三版中关于webworker的通信方式，也可以参考：http://nodejs.cn/api/child_process.html#child_process_child_send_message_sendhandle_options_callback）--》
 6、scripts--》start.js--》
-7、react-dev-utils工具包--》
+7、react-dev-utils工具包
+（7.1、clearconsole判断操作系统平台
+7.2、checkRequiredFiles查找文件是否存在
+7.3、）--》
 8、config--》
 9、webpack.config.dev.js
 
