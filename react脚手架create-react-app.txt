@@ -27,7 +27,9 @@ npm-run-all：安装 npm install --save npm-run-all
 7.3、choosePort--"detect-port-alt"nodejs中检测端口的工具：https://www.npmjs.com/package/detect-port-alt
 7.4、url工具、address工具等nodejs工具，很多需要用的工具都可以在npmjs上找到。
 7.5、webpack的nodejs API配置v3：https://webpack.js.org/api/node/和v1，http://webpack.github.io/docs/node.js-api.html
-7.6、webpack-dev-server的nodejs配置）--》
+7.6、webpack-dev-server的nodejs配置new WebpackDevServer(compiler, {...})。
+v3：https://webpack.js.org/configuration/dev-server/
+v2：http://webpack.github.io/docs/webpack-dev-server.html）--》
 8、config--》
 9、webpack.config.dev.js
 
