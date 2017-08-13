@@ -4,3 +4,6 @@ config-lite 是一个轻量的读取配置文件的模块。config-lite 会根�
 下面引用config的默认default配置时，提示找不到配置信息，
 最新的config-lite用法是：
 var config = require('config-lite')(__dirname);
+
+2、pinyin
+转换中文字符为拼音。可以用于汉字注音、排序、检索。
