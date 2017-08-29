@@ -8,10 +8,12 @@ import { Scrollbars } from 'react-custom-scrollbars';
 import {deepCopy} from '../../utility';
 import './index.css';
 const prefix= 'chat-chat';
-//思路：1、单击输入框的时候，在光标处插入一个文本（[19mpsicjroe]），这个文本时乱写的，因为后面要用它来分割，所以尽量写复杂点，避免重复，然后获取输入框的
+//思路：1、单击输入框的时候，在光标处插入一个文本（[19mpsicjroe]），这个文本时乱写的，因为后面要用它来分割，所以尽量写复杂点，避免重复，然后获取输
+//入框的
 //innerHTML，用[19mpsicjroe]分割成前后两部分，firstHalf和secondHalf，
 //2、将firstHalf和secondHalf保存下来（便于后面的插入表情操作），然后再将firstHalf和secondHalf重新设置回innerHTML
-//3、这个时候要重新设置光标位置，首先判断之前点击的光标的位置两边是否都是文本，
+//3、这个时候要重新设置光标位置，首先判断之前点击的光标的位置两边的内容，1）如果两边都是文本或者左边是文本右边是img或br标签，则
+
 
 class ChatChat extends Component {
     constructor(){
