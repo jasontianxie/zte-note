@@ -1,0 +1,413 @@
+/**
+ * Created by 6407001392 on 2017/8/3.
+ */
+import React, { Component } from 'react';
+import ChatList from '../chat_list/index';
+import FreeScrollBar from 'react-free-scrollbar';
+import { Scrollbars } from 'react-custom-scrollbars';
+import {deepCopy} from '../../utility';
+import './index.css';
+const prefix= 'chat-chat';
+//思路：1、单击输入框的时候，在光标处插入一个文本（[19mpsicjroe]），这个文本时乱写的，因为后面要用它来分割，所以尽量写复杂点，避免重复，然后获取输入框的
+//innerHTML，用[19mpsicjroe]分割成前后两部分，firstHalf和secondHalf，
+//2、将firstHalf和secondHalf保存下来（便于后面的插入表情操作），然后再将firstHalf和secondHalf重新设置回innerHTML
+//3、这个时候要重新设置光标位置，首先判断之前点击的光标的位置两边是否都是文本，
+
+class ChatChat extends Component {
+    constructor(){
+        super();
+        this.state = {
+             showBig:false,
+             picNum:0,
+            // focusPosition:4
+        }
+        this.userData={firstHalf:'',secondHalf:'',nodeNumber:0,offset:0};
+        this.names=['微笑','调皮','大笑','偷笑','捂脸','害羞','想哭','委屈','大哭','流泪','傲娇','无语','尴尬','头晕','惊讶','生气','闭嘴','难受','生病','口罩','亲亲','羡慕','爱钱','困','睡觉','酷','打脸','天使','怪兽','大便'];
+        this.changeEmoticon=this.changeEmoticon.bind(this);
+        this.insertEmoticon=this.insertEmoticon.bind(this);
+        this.scrollToBottom=this.scrollToBottom.bind(this);
+        this.onpasteFunc=this.onpasteFunc.bind(this);
+        this.clickToSplit=this.clickToSplit.bind(this);
+        this.generateImgs=this.generateImgs.bind(this);
+    }
+    onpasteFunc(){
+        setTimeout(() =>{////
+            // console.log(dom);
+            // console.log(dom.innerHTML+"adsfasdfadsfasdfasdf");
+            let htmlTemp = this.refs.input.innerHTML;
+            // console.log(typeof htmlTemp);
+            // console.log(this.refs.input.innerHTML);
+            // dom.innerHTML = dom.innerHTML.replace(/<\/?[^img|br][^>]*>/gi,'');//仅保留img和br标签，其他标签都替换为空字符，其中img中src只能是图片，不能是其他格式的文件
+            let aaaa = htmlTemp.replace(/<(?!\/?BR|\/?IMG)[^<>]*>/ig,'');//过滤掉除img和br以外的其他html标签
+            // console.log(aaaa);
+            let bbbb = aaaa.replace(/<img[^<]*src="(?![http:\/\/localhost:3000\/webZchatAppEmoticonimgs|\/webZchatAppEmoticonimgs])[^>]*>/ig,'');//对于图片只能是指定网址下的图片，其他图片过滤掉
+            // console.log(bbbb);
+            this.refs.input.innerHTML = bbbb;
+            // console.log(htmlTemp.replace(/<(?!\/?BR|\/?IMG)[^<>]*>/ig,'')+"11111111");
+        },1);
+    }
+    changeEmoticon(bool){
+        this.setState({showEmoticon:bool});
+    }
+    showBigPic(status,num){
+        this.setState(Object.assign({},this.state,{picNum:num,showBig:status}));
+    }
+    generateImgs(){
+        let imgs = [];
+        for(let i=0;i<30;i++) {
+            imgs.push(<img key={i+1} src={'/webZchatAppEmoticonimgs/'+this.names[i]+'.png'} style={{width:'30px',height:'30px'}} onClick={() =>{this.insertEmoticon(2,i);}} onMouseOver={()=>this.showBigPic(true,i)} onMouseLeave={()=>this.showBigPic(false,i)}/>);
+        }
+        return imgs;
+    }
+    insertEmoticon(type,num){
+        if(document.activeElement !== this.refs.input&&this.refs.input.innerHTML===this.userData.firstHalf+this.userData.secondHalf){
+            console.log('focus')
+            this.refs.input.focus();
+            let selection = window.getSelection();
+            let range = selection.getRangeAt(0)||selection.createRange();
+            console.log(this.userData.secondHalf[0]);
+            let nodeText = '';
+            let splitType = 1;
+            if(this.userData.secondHalf[0]!=="<"){
+                nodeText=this.userData.secondHalf.match(/[^<>]*/)[0];
+                splitType = 1;
+            }else{
+                nodeText=this.userData.secondHalf.match(/^<[^<>]*?>/)[0];
+                splitType = 2;
+            }
+            console.log(nodeText);
+            if(type === 2) {//type==1插入换行符，type=2插入表情
+                this.refs.input.innerHTML = this.userData.firstHalf + '<img src="/webZchatAppEmoticonimgs/'+this.names[num]+'.png" style="width:30px;height:30px"/>' + this.userData.secondHalf;
+            }else{
+                if(this.userData.secondHalf == '')
+                {this.refs.input.innerHTML = this.userData.firstHalf + '<br/><br/>' + this.userData.secondHalf;}
+                else{
+                    this.refs.input.innerHTML = this.userData.firstHalf + '<br/>' + this.userData.secondHalf;
+                }
+            }// this.userData.firstHalf+='<img src="http://forum.csdn.net/PointForum/ui/scripts/csdn/Plugin/001/face/'+(num+1)+'.gif" style="width:30px;height:30px"/>';
+            let array2=[];
+            if (splitType === 1){
+                array2=this.refs.input.innerHTML.split(new RegExp('>'+nodeText));
+            }else{
+                array2=this.refs.input.innerHTML.split(new RegExp(nodeText));
+            }
+            console.log(array2);
+            let array2Length = array2.length;
+            let countArray2 = 1;
+            if(nodeText === ''){
+                try{
+                    selection.collapse(this.refs.input,this.refs.input.childNodes.length);
+                }catch(e){
+                    console.log(e);
+                }
+            }
+            if(splitType ===  1){
+                for(let ii=0;ii<this.refs.input.childNodes.length;ii++){
+                    console.log(this.refs.input.childNodes.length)
+                    if(this.refs.input.childNodes[ii].nodeValue === nodeText){
+                        console.log('adfasdfsaf')
+                        let compareText2 = array2[0]+'>';
+                        for(let jj=1;jj<countArray2;jj++){
+                            compareText2+=nodeText;
+                            compareText2+=array2[jj]+'>';
+                        }
+                        console.log(compareText2);
+                        console.log(this.userData.firstHalf+'<img src="/webZchatAppEmoticonimgs/'+this.names[num]+'.png" style="width:30px;height:30px">')
+                        if(compareText2 === this.userData.firstHalf+'<img src="/webZchatAppEmoticonimgs/'+this.names[num]+'.png" style="width:30px;height:30px">'){
+                            console.log(11111)
+                            this.userData.nodeNumber = ii;
+                            console.log(this.userData.nodeNumber);
+                            // selection.collapse(this.refs.input.childNodes[this.userData.nodeNumber],0);
+                            selection.collapse(this.refs.input.childNodes[this.userData.nodeNumber],0);
+                            break;
+                        }
+                        console.log(countArray2);
+                        countArray2++;
+                    }
+                }
+            }else{
+                for(let ii=0;ii<this.refs.input.childNodes.length;ii++){
+                    console.log(this.refs.input.childNodes.length)
+                    if(this.refs.input.childNodes[ii].outerHTML === nodeText){
+                        console.log('adfasdfsaf')
+                        let compareText2 = array2[0];
+                        for(let jj=1;jj<countArray2;jj++){
+                            compareText2+=nodeText;
+                            compareText2+=array2[jj];
+                        }
+                        console.log(compareText2);
+                        console.log(this.userData.firstHalf+'<img src="/webZchatAppEmoticonimgs/'+this.names[num]+'.png" style="width:30px;height:30px">')
+                        if(compareText2 === this.userData.firstHalf+'<img src="/webZchatAppEmoticonimgs/'+this.names[num]+'.png" style="width:30px;height:30px">'){
+                            console.log(11112)
+                            this.userData.nodeNumber = ii;
+                            console.log(this.userData.nodeNumber);
+                            // selection.collapse(this.refs.input.childNodes[this.userData.nodeNumber],0);
+                            selection.collapse(this.refs.input,this.userData.nodeNumber);
+                            // console.log(selection.getRangeAt(0));
+                            break;
+                        }
+                        console.log(countArray2);
+                        countArray2++;
+                    }
+                }
+            }
+            return;
+        }
+        this.refs.input.focus();
+        // let aaaa = this.refs.input.innerHTML.split('');
+        // aaaa.splice(this.state.focusPosition,0,'<img src="http://forum.csdn.net/PointForum/ui/scripts/csdn/Plugin/001/face/'+(num+1)+'.gif" style="width:30px;height:30px"/>');
+        // console.log(aaaa.join(''));
+        // this.setState(Object.assign({},this.state,{textarea:aaaa.join('')}));
+        console.log(333333);
+        let selection = window.getSelection();
+        let range = selection.getRangeAt(0)||selection.createRange();
+        console.log(range);
+
+        // range.setStart(this.refs.input,0);
+        // if(range.startContainer.nodeName === 'IMG'){
+        //     selection.collapse(this.refs.input,0);
+        // }
+        selection.removeAllRanges();
+        let hasR = range.createContextualFragment(type === 1 ? (this.userData.secondHalf===''?'<br/><br/>':'<br/>') : '<img src="/webZchatAppEmoticonimgs/'+this.names[num]+'.png" style="width:30px;height:30px">');
+        range.insertNode(hasR);
+		range.collapse(false);
+        selection.addRange(range);
+        // selection.collapse(this.refs.input,this.refs.input.childNodes.length);
+        // this.refs.input.innerHTML = aaaa.join('');
+        // console.log(this.userData.position);
+    }
+    clickToSplit(e){
+        // console.log(this.refs.input.innerText.length);
+        let selection = window.getSelection();
+        let selectionCollapsed = selection.isCollapsed;
+        if(!selectionCollapsed)return;
+        if(this.refs.input.innerHTML.replace(/\s/gi,'') === "")return;
+        console.log(selection.focusNode.nodeName+'focus');
+        console.log(selection.anchorNode.nodeName+'anchor');
+        console.log(selection.focusNode);
+        if(selection.focusNode.nodeName === "IMG")return;
+        let divOrNot = (selection.focusNode.nodeName === "DIV");
+        console.log(selection.anchorNode.nodeValue);
+        for(let i=0;i<this.refs.input.childNodes.length;i++){
+            if(this.refs.input.childNodes[i]===selection.anchorNode){
+                this.userData.nodeNumber=i;
+            }
+        };
+        // this.userData.nodeNumber = selection.anchorNode;
+        if(selection.anchorNode.nodeName === "img"){
+            this.userData.offset = 1;
+        }else{
+            this.userData.offset = selection.anchorOffset;
+        }
+        let range = selection.getRangeAt(0)||selection.createRange();
+        // let rangeTemp = range.cloneRange();
+        selection.removeAllRanges();
+        let hasR = range.createContextualFragment('[19mpsicjroe]');
+        range.insertNode(hasR);
+        range.collapse(false);
+        selection.addRange(range);
+        let arrayTemp = this.refs.input.innerHTML.split('[19mpsicjroe]');
+        console.log(arrayTemp)
+        this.userData.firstHalf = arrayTemp[0];
+        this.userData.secondHalf = arrayTemp[1]||'';
+        this.refs.input.innerHTML = this.refs.input.innerHTML.replace('[19mpsicjroe]','');
+        // selection.collapse(this.userData.node,this.userData.offset);
+        console.log(this.userData.nodeNumber);
+        // let rangeObj = document.createRange();
+        // rangeObj.setStart(this.userData.node,1);
+        // rangeObj.setEnd(this.userData.node,4);
+        console.log(this.userData.offset);
+        // if(selectionCollapsed){
+        //     selection.collapse(this.refs.input.childNodes[this.userData.nodeNumber],this.userData.offset);
+        // }else{
+        //     selection.removeAllRanges();
+        //     console.log(rangeTemp.collapsed);
+        //     selection.addRange(rangeTemp);
+        // }
+        console.log(this.userData.firstHalf);
+        console.log(this.userData.secondHalf);
+        let textNode = '';
+        // console.log(selection.anchorNode.nodeName);
+        // if(selection.anchorNode.nodeName === 'BR'){
+        //     selection.collapse(this.refs.input,this.refs.input.childNodes.length);
+        //     return;
+        // }
+        let splitType = 1;
+        let array1=[];
+        if(this.userData.secondHalf !== ''){
+            if(this.userData.secondHalf[0]!=="<"){
+                textNode=this.userData.secondHalf.match(/[^<>]*/)[0];
+                array1=this.refs.input.innerHTML.split(new RegExp('>'+textNode));
+                splitType = 1;
+            }else{
+                textNode=this.userData.secondHalf.match(/^<[^<>]*?>/)[0];
+                array1=this.refs.input.innerHTML.split(new RegExp(textNode));
+                splitType = 2;
+            }
+        }
+        console.log(textNode);
+        console.log(array1)
+        let array1Length = array1.length;
+        let countArray = 1;
+        console.log(selection.anchorNode.nodeName);
+        if(divOrNot){//如果分离点不是两边都是文字（光标前面是图片或br，后面是文字。或者光标在结尾）
+            console.log('454545454545');
+            if(textNode === ''){
+                try{
+                    selection.collapse(this.refs.input,this.refs.input.childNodes.length);
+                }catch(e){
+                    console.log(e);
+                }
+            }
+            if(splitType === 1){//如果分离点右边是文字
+                for(let ii=0;ii<this.refs.input.childNodes.length;ii++){
+                    if(this.refs.input.childNodes[ii].nodeValue === textNode){//||this.refs.input.childNodes[ii].outerHTML === textNode
+                        console.log('adfasdfsaf')
+                        let compareText = array1[0]+'>';
+                        for(let jj=1;jj<countArray;jj++){
+                            compareText+=textNode;
+                            compareText+=array1[jj]+'>';
+                        }
+                        console.log(compareText)
+                        if(compareText === this.userData.firstHalf){
+                            this.userData.nodeNumber = ii;
+                            console.log(this.userData.nodeNumber);
+                            try{
+                                selection.collapse(this.refs.input.childNodes[this.userData.nodeNumber],0);
+                            }catch (e){
+                                console.log(e)
+                            }
+                            return;
+                        }
+                        countArray++;
+                    }
+                }
+            }else {//如果分离点右边是图片或br
+                for(let ii=0;ii<this.refs.input.childNodes.length;ii++){
+                    if(this.refs.input.childNodes[ii].outerHTML === textNode){
+                        console.log('adfasdfsaf')
+                        let compareText = array1[0];
+                        for(let jj=1;jj<countArray;jj++){
+                            compareText+=textNode;
+                            compareText+=array1[jj];
+                        }
+                        console.log(compareText)
+                        if(compareText === this.userData.firstHalf){
+                            this.userData.nodeNumber = ii;
+                            console.log(this.userData.nodeNumber);
+                            try{
+                                selection.collapse(this.refs.input,this.userData.nodeNumber);
+                            }catch (e){
+                                console.log(e)
+                            }
+                            return;
+                        }
+                        countArray++;
+                    }
+                }
+            }
+
+        }else{//如果分离点两边都是文字
+            try{
+                selection.collapse(this.refs.input.childNodes[this.userData.nodeNumber],this.userData.offset);
+            }catch(e){
+                console.log(e);
+            }
+
+        }
+        // range.collapse(false);
+        console.log(this.userData);
+    }
+    scrollToBottom(){
+        this.refs.scrollbar.scrollToBottom()
+    }
+    componentDidUpdate(nextProps,nextState){
+        if(this.props.chatHistory.length !== nextProps.chatHistory.length){
+            this.scrollToBottom();
+        }
+        // this.refs.input.innerHTML = this.state.textarea;
+    }
+    render() {
+        const {userid, userPic, choseChatInfo, chatHistory, memberList, sendSingleMessage, sendGroupMessage, showEmoticon, showEmoticonClick} = this.props;
+        // console.log(chatHistory);
+        return (
+            <div className={`${prefix}-wrap`}>
+                <div className={`${prefix}-head`}>欢迎您使用zChat网页版</div>
+                <div className={`${prefix}-content`}>
+                    <Scrollbars ref="scrollbar" autoHide autoHideTimeout={500} style={{ width: '100%', height: '100%' }}>
+                        {<ChatList history={chatHistory}/>}
+                    </Scrollbars>
+                </div>
+                <div className={`${prefix}-operation`}>
+                    <div className={`${prefix}-emoticonClickWrap`}>
+                        <div className={`${prefix}-emoticonClick`} onClick={(e) =>{
+                            e.stopPropagation();
+                            this.props.showEmoticonClick()}}></div>
+                    </div>
+                    <div className={`${prefix}-input`}>
+                        {/*<Scrollbars ref="scrollbar" style={{ width: '505px', height: '80px' }}>*/}
+                            <div contentEditable="true" className={`${prefix}-textarea`} placeholder="我想说....." ref="input" onKeyDown={
+                                (e)=>{
+                                    if(e.keyCode===13&&e.ctrlKey) {
+                                        this.insertEmoticon(1,2);
+                                    }
+                                    if(e.keyCode===13&&!e.ctrlKey){
+                                        e.preventDefault();
+                                        if(this.refs.input.innerHTML===''){
+                                            return;
+                                        }
+                                        console.log("send message");
+                                        if(this.refs.input.innerHTML.replace(/([\s|<br>|&nbsp;])/g,"")===''){
+                                            console.log('can not input blank');
+                                            this.refs.input.innerHTML='';
+                                            return;
+                                        }
+                                        if(choseChatInfo.friendOrGroup === 0){
+                                            sendSingleMessage({destAddress:choseChatInfo.id,bodyText:this.refs.input.innerHTML,id:userid,picUrl:userPic});
+                                        }else{
+                                            sendGroupMessage('send group messages');
+                                        }
+                                        this.refs.input.innerHTML='';
+                                    }
+                                }
+                            } onClick={(e)=>{e.stopPropagation();this.clickToSplit(e)}} onPaste={(e)=>{this.onpasteFunc()}}></div>
+                        {/*</Scrollbars>*/}
+                    </div>
+                    <div className={`${prefix}-btnWrap`}>
+                        <div className={`${prefix}-btn`} onClick={()=>{
+                            if(this.refs.input.innerHTML.replace(/([\s|<br>|&nbsp;])/g,"")===''){
+                                console.log('can not input blank');
+                                this.refs.input.innerHTML='';
+                                return;
+                            }
+                            if(choseChatInfo.friendOrGroup === 0){
+                                sendSingleMessage({destAddress:choseChatInfo.id,bodyText:this.refs.input.innerHTML,id:userid,picUrl:userPic});
+                            }else{
+                                sendGroupMessage('send group messages');
+                            }
+                            // this.setState(Object.assign({},this.state,{textarea:""}));
+                            this.refs.input.innerHTML='';
+                        }}>
+                            Enter发送
+                        </div>
+                        <div className={`${prefix}-ctlEnter`}>
+                            Ctrl+Enter换行
+                        </div>
+                    </div>
+                    <div className={`${prefix}-emoticon${showEmoticon?'':'-hidden'}`} onClick={(e)=>e.stopPropagation()}>
+                        <div className={`${prefix}-emoticonTitle`}>系统表情</div>
+                        {
+                            this.generateImgs()
+                        }
+                    </div>
+                    <div className={`${prefix}-bigPic-${this.state.showBig}`}>
+                        <div className={`${prefix}-bigPicImg`}><img src={"/webZchatAppEmoticonimgs/"+this.names[this.state.picNum]+".png"} alt="no pic"/></div>
+                        <div className={`${prefix}-bigPicText`}>{this.names[this.state.picNum]}</div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+
+export default ChatChat;
