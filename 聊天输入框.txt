@@ -13,7 +13,14 @@ const prefix= 'chat-chat';
 //innerHTML，用[19mpsicjroe]分割成前后两部分，firstHalf和secondHalf，
 //2、将firstHalf和secondHalf保存下来（便于后面的插入表情操作），然后再将firstHalf和secondHalf重新设置回innerHTML
 //3、这个时候要重新设置光标位置，首先判断之前点击的光标的位置两边的内容，1）如果两边都是文本或者左边是文本右边是img或br标签，则
-
+//section.anchorNode为text，可以用section.anchorNode将文本节点保存下来，并用
+//selection.anchorOffset将偏移量保存下来，然后就可以用section.collapse方法重新设置光标位置了。2）如果左边是img或br标签，右边是文本，则
+//section.anchorNode为父元素div，section.anchorNode将不起作用。所以要重新找出节点，以便用section.collapse设置光标。我在这里使用的方法
+//是：首先判断section.anchorNode是否是父元素div，如果是，又分为两种情况，第一种：右边是“文本”左边是img或br标签，那么就用">+文本"来分割，
+//为什么要这样呢，因为如果只用"文本"来分割innerHTML，有可能img标签中也有该"文本"，会导致混淆(实际上用正则表达式，就是用不在标签内的“文本”来
+//分割，只不过我没写出来这个正则，所以用了这个方法）。分割完了过后，再用innerHTML.childNodes来循环查找，如果这个节点之前的文本等于firstHalf
+//那么就表示找到了该节点，节点找到后，就可以用section.collapse重新设置光标了。第二种：左右两边都是img或br标签，这种情况出现在换行的时候，
+//光标在换行后的开始位置。这个时候直接用右边的img或br标签来分割，然后用第一种方法循环查找节点。
 
 class ChatChat extends Component {
     constructor(){
