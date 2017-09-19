@@ -1,0 +1,441 @@
+1、在github上新建仓库
+项目地址：https://github.com/jasontianxie/huatian-mock-react-demo.git
+
+2、检出仓库到本地
+配置.gitignore文件  Git 的 .gitignore 配置.note
+
+3、安装nodejs（直接在nodejs官网即可下载最新版本）
+nodejs和npm是同时安装的，如果执行node和npm的时候提示不是内部或外部命令，则是因为没有设置环境变量。（我的电脑右键-->属性-->高级系统设置-->高级-->环境变量-->在用户变量和系统变量的path中添加node和npm的路径）
+4、创建package.json（可以直接新建文件，也可以用npm init命令通过问答的方式创建）。
+
+建议使用淘宝国内镜像安装npm包。参考：淘宝镜像：.note
+Windows上安装运行 cnpm, 来代替 npm.note
+5、安装webpack模块
+
+//全局安装
+	npm install -g webpack
+	//安装到你的项目目录
+	npm install --save-dev webpack
+
+6、在根目录下新建webpack.config.js。然后配置该文件（主要参考webpack主教程：Webpack傻瓜式指南（一）.note）
+（1）安装html-webpack-plugin
+命令：npm install html-webpack-plugin --save-dev
+使用教程：html-webpack-plugin.note
+（2）安装babel。命令：
+npm install --save-dev babel-core babel-loader babel-preset-es2015 babel-preset-react
+//其中 babel-core是核心模块，babel-loader是webpackloader，babel-preset-es2015是es6转码器，
+babel-preset-react是jsx转码成js的模块
+更多babel功能：如何写好.babelrc？Babel的presets和plugins配置解析.note
+babel github用户手册.note
+（3）安装react
+ npm install --save react react-dom
+打包时如果报错：找不到React，则就是某个文件头部没有引用import React from ‘react’
+（4）配置babel-loader
+ {
+        test: /\.jsx?$/,
+        loader: 'babel-loader',
+        include: APP_PATH,
+        query: {
+          //添加两个presents 使用这两种presets处理js或者jsx文件
+          presets: ['es2015', 'react']
+        }
+//{或者这样配置
+//test: /(\.jsx|\.js)$/,
+//loaders: ['babel-loader?presets[]=es2015&presets[]=react'],
+//exclude: /node_modules/
+//}
+
+或者在webpack.config.js同一目录下创建.babelrc文件，文件的内容参考文章：
+如何写好.babelrc？Babel的presets和plugins配置解析.note
+然后就不用写query属性或写？后面的参数了
+      }
+
+7、配置生产环境和开发环境
+（1）运行webpack命令时设定node的环境变量
+在package.json文件中的scripts字段添加
+"scripts": {
+    "dev": "cross-env NODE_ENV=development webpack --config webpack.config.js",
+    "pro": "cross-env NODE_ENV=production webpack --config webpack.config.pro.js"
+  }
+对以上配置的说明：
+1>
+关于scripts字段的配置，参考：package.json文件--阮一峰.note
+package.json文件属性详解.note
+2>
+//cross-env用于跨平台设置环境变量。
+//因为不同的平台设置环境变量的方法不同（
+linux & mac: export NODE_ENV=production
+windows: set NODE_ENV=production
+）
+//所以cross-env就是为了解决这个问题。使用前先安装：npm install --save-dev cross-env
+//cross-env的项目地址：https://www.npmjs.com/package/cross-env(package.json中不能用注释，否则报错)
+3>
+webpack设置不同的配置文件，参考：webpack命令行参数.note
+（2）开发环境中有warning提示，这会消耗性能，生产环境中应该关闭
+在webpack.config.pro.js中的plugins字段添加：
+new webpack.DefinePlugin({
+      'process.env': { //这是为了提升性能。
+        NODE_ENV: JSON.stringify('production')
+      }
+    })
+参考文章：https://facebook.github.io/react/docs/optimizing-performance.html#use-the-production-build
+如果不添加上面的配置。则在浏览器中将会出现下面的提示，其实就是在开发环境中，默认会在浏览器中出现很多提示信息，再生产环境中不需要这些提示了（双击图片放大）：
+
+（3）在webpack.DefinePlugin中设置全局变量，以便在其他文件中使用
+new webpack.DefinePlugin({
+      'process.env': { //这是为了提升性能。
+        NODE_ENV: JSON.stringify('production')
+      }，
+__DEV__: process.env.NODE_ENV.trim() === 'development',
+    __PROD__: process.env.NODE_ENV.trim() === 'production'
+    })
+8、配置sass解析
+（1）安装模块，解析sass
+npm install sass-loader node-sass --save-dev
+项目地址：https://github.com/webpack-contrib/sass-loader
+npm install css-loader style-loader --save-dev
+项目地址：https://github.com/webpack-contrib/css-loader
+https://github.com/webpack-contrib/style-loader
+（2）配置webpack.config.js
+{
+         test: /\.scss$/,
+       	 loaders: ['style', 'css', 'sass'],
+         include: APP_PATH
+      	}
+（3）下载初始化css-----normalize.css
+        下载地址：http://necolas.github.io/normalize.css/
+（4）分离css文件
+ 安装：npm install extract-text-webpack-plugin --save-dev
+ 使用参考：extract-text-webpack-plugin 插件介绍.note
+（5）生产环境下压缩css文件
+1、如果css文件没有分离，则UglifyJsPlugin就可以完成压缩，因为css是内嵌在js中的，所以压缩js的时候就一起压缩了。
+2、如果css分离了，那么要使用插件optimize-css-assets-webpack-plugin
+插件使用方法：optimize-css-assets-webpack-plugin.note
+（6）添加浏览器兼容前缀
+关于css浏览器兼容性检查：can i use 网站.note
+在线添加前缀：http://autoprefixer.github.io/
+1、安装postcss-loader：命令 npm install postcss-loader --save-dev
+使用：postcss-loader.note
+更多关于postcss的功能查看官网：https://github.com/postcss/postcss
+postcss是一个处理css的平台，具体的功能，由各种各样的plugins来提供。最流行的plugin就是autoprefixer。其他的plugin，比如precss：https://github.com/jonathantneal/precss。使用这个插件后，就可以按照类似sass的语法来写css。比如short：https://github.com/jonathantneal/postcss-short。使用这个插件后，就可以按照它规定的语法来写css：
+/* before */
+			.icon {
+			    size: 48px;
+			}
+
+		/* after */
+			.icon {
+			    width: 48px;
+			    height: 48px;
+			}
+上面的“before”代码中的size属性，在css中是不存在的。但是使用了short插件，就可以这样写，最后会解析成“after”中的代码
+2、配置postcss-loader：参考官网 https://github.com/postcss/postcss-loader
+（1）在项目的根目录下创建postcss.config.js（官网中说也可以不创建文件，而直接在webpack.config.js中配置，具体看官网），也可以在子目录中创建该文件，如果子目录中有该文件，则它里面的配置会覆盖根目录中的配置。
+（2）配置postcss.config.js
+该文件的配置，官网给出的例子是：
+module.exports = {
+			  plugins: [
+			    require('postcss-smart-import')({ /* ...options */ }),
+			    require('precss')({ /* ...options */ }),
+			    require('autoprefixer')({ /* ...options */ })
+			  ]
+			}
+本例中只是添加前缀，所以只需要 require('autoprefixer')({ /* ...options */ })。
+1》使用之前，先安装autoprefixer：npm install autoprefixer --save-dev
+2》autoprefixer的options的配置，参考官网：https://github.com/postcss/autoprefixer
+其中本例中只使用了browsers选项。
+关于browserlist的配置，官网：https://github.com/ai/browserslist。这些配置可以写在多个地方，如js文件中，或者写在package.json中（看官网）。
+最后的到的配置文件为：
+module.exports = {
+			  plugins: [
+			    require('autoprefixer')({"browsers": [
+   		"> 1%",
+    				"last 2 versions"
+  ]})
+			  ]
+			}
+或者：
+module.exports = {
+			  plugins: [
+			    require('autoprefixer')()
+			  ]
+			}
+并在package.json文件中添加
+"browserslist": [
+   "> 1%",
+    			"last 2 versions"
+  ]
+注意：package.json中是browserslist，而webpack中是browsers
+（7）删除没有用到的css（uncss）。这个功能可有可无
+uncss因为是通过对比html和css文件来实现功能的，所以在react中uncss用不了，因为所有的html都打包到js中了。
+1、可以用postcss-uncss
+2、或者gulp-uncss
+3、或者用chrome自带的工具
+如果你用chrome的话，f12，然后找到audits，
+选择web page performance（也可以用默认），run一下就能看到相关信息
+（8）css模块化（使用此功能，为了防止命名冲突，就不用给类加前缀了）（该功能用在sass中不是很好用，还是用以前的加前缀的方法）
+参考：https://github.com/css-modules/postcss-modules
+http://www.w3cplus.com/preprocessor/postcss-modules-make-css-great-again.html
+http://www.w3cplus.com/blog/tags/516.html
+http://www.ruanyifeng.com/blog/2016/06/css_modules.html
+1、安装postcss-modules。npm install --save-dev postcss-modules
+2、在postcss.config.js中添加插件（postcss-modules官网：https://github.com/css-modules/postcss-modules）：
+require('postcss-modules')({
+    		getJSON: function(cssFileName, json) {
+ 		     var path          = require('path');
+ 		     var cssName       = path.basename(cssFileName, '.css');
+  		    var jsonFileName  = path.resolve('./build/' + cssName + '.json');
+  		    fs.writeFileSync(jsonFileName, JSON.stringify(json));//生成“转换json”文件
+  		  }
+ 		 })
+3、每个react组件引入自己的sass文件，引入“转换json”文件，如果有公共的mixins或者sass函数，也要引入。
+（9）安装classnames（在react组件中可以生成多个类名）
+安装命令：npm install classnames --save
+官网地址：https://github.com/JedWatson/classnames
+使用方法：
+   classNames('foo', 'bar'); // => 'foo bar'
+			classNames('foo', { bar: true }); // => 'foo bar'
+			classNames({ 'foo-bar': true }); // => 'foo-bar'
+			classNames({ 'foo-bar': false }); // => ''
+			classNames({ foo: true }, { bar: true }); // => 'foo bar'
+			classNames({ foo: true, bar: true }); // => 'foo bar'
+			// lots of arguments of various types
+			classNames('foo', { bar: true, duck: false }, 'baz', { quux: true }); // => 'foo bar baz quux'
+			// other falsy values are just ignored
+			classNames(null, false, 'bar', undefined, 0, 1, { baz: null }, ''); // => 'bar 1'
+Arrays will be recursively flattened as per the rules above:
+   var arr = ['b', { c: true, d: false }];
+			classNames('a', arr); // => 'a b c'
+8、配置开发工具
+（1）配置source-map
+1、为什么要用source-map？
+是为了排错时能快速定位，在react中每一个组件就是一个js文件，最后全部都会打包成一个js文件。在浏览器中调试的时候，只会告知出错的代码在打包后的js文件的位置。并不能找到在实际组件中的位置。
+开发总是离不开调试，如果可以更加方便的调试当然就能提高开发效率，不过打包后的文件有时候你是不容易找到出错了的地方对应的源代码的位置的，Source Maps就是来帮我们解决这个问题的。
+通过简单的配置后，Webpack在打包时可以为我们生成的source maps，这为我们提供了一种对应编译文件和源文件的方法，使得编译后的代码可读性更高，也更容易调试。
+2、使用
+现在的代码是合并以后的代码，不利于排错和定位，只需要在config中添加
+  ...
+  		devtool: 'eval-source-map',
+		  ...
+
+这样出错以后就会采用source-map的形式直接显示你出错代码的位置
+（本例中只在开发环境中使用了source-map，生产环境中没有配置）
+3、source-map的种类
+参考有道笔记/webpack/source map中的文章
+（2）配置dev-server（dev-middleware）可以直接配置dev-middleware，而不用dev-server
+安装命令：npm install --save-dev webpack-dev-server
+webpack-dev-server命令的命令行参数可以使用webpack的参数，但是webpack-dev-server还有一些自己的参数。实际上webpack-dev-server命令是增强版的webpack命令。也就是说，在package.json的scripts中使用了webpack-dev-server命令，就不用webpack了。如下：
+
+1》设置自动刷新
+首先在webpack.config.js的config中添加devServer字段。如下
+devServer:{
+    inline:true,//增加实时刷新
+    port:9000,//更改端口
+    historyApiFallback: true//当404错误时，自动访问index.html
+  }
+更多选项查看：https://webpack.js.org/configuration/dev-server/#devserver
+注意有些只能在命令行中使用，比如progress，即只能这样webpack-dev-server --progress
+然后要在webpack.config.js的output字段增加publicPath字段，把该字段写成webpack-dev-server的地址：http://localhost:9000/build（build是打包后生成文件的目录）。因为webpack-dev-server生成的内容是在内存中的，而不是在硬盘中的，所以如果删除build文件夹中生成的文件，再执行webpack-dev-server命令，是不会再build文件夹中看到生成的文件，因为并没有生成文件在硬盘上，而是在内存中。
+最后运行 npm run server就可以实时刷新了。
+（实验中发现，如果增加了hot：true选项，实时刷新将不能成功）
+2》设置react模块的热替换（有了热替换后就可以不用配置自动刷新了，因为热替换就是更高一级的自动刷新，所以可以把webpack配置文件中的devServer字段删除）
+方法1：http://www.qdfuns.com/notes.php?mod=view&u=27029&id=7b9f95a27e8cc93cd751ccbbd97d32d6。实验过后并不能实现热加载，网上说babel6不支持（http://react-china.org/t/babel6-transform-hmr-hmr/3176）。
+方法2：用webpack-dev-middleware（实验过后可行，注意：如果要css支持热替换，则只能使用内联的css不能用extract-text-webpack-plugin分离）
+（更多相关配置，可以查看官网
+http://madole.github.io/blog/2015/08/26/setting-up-webpack-dev-middleware-in-your-express-application/
+以及
+https://www.npmjs.com/package/webpack-hot-middleware）
+首先安装模块。
+npm install --save-dev express webpack-dev-middleware webpack-hot-middleware
+然后添加plugins。
+plugins: [
+    // OccurenceOrderPlugin is needed for webpack 1.x only 
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoErrorsPlugin()
+]
+然后在webpack的配置文件中的entry字段添加
+webpack-hot-middleware/client
+得到的结果为：
+entry: [
+  'eventsource-polyfill',//这个模块网上说是为了热加载时兼容ie，具体功能没有实践过，使用前先安装该模块。
+  'webpack-hot-middleware/client?reload=true',//这里 reload=true 的意思是，如果碰到不能hot reload的情况，就整页刷新。除了reload还有其他选项，详情见官网。
+  'webpack/hot/only-dev-server',//官网上建议去掉这个选项，并使用reload=true代替
+  './app.jsx'//这是项目的入口文件
+]
+注意：在webpack.config.js的output字段增加publicPath字段，把该字段写成webpack-dev-middleware服务器的地址：http://localhost:9000/build
+然后新建一个js文件如‘mynode.js’
+在该文件中写入如下代码：
+var webpack = require('webpack');
+var webpackConfig = require('./webpack.config');//这是webpack的配置文件路径
+var express = require('express');
+var app = express();
+ 
+var compiler = webpack(webpackConfig);
+app.use(require('connect-history-api-fallback')());//这行代码可以不用，关于这个模块的功能，看官网
+app.use(express.static('./assets'));//这行代码可以不用，这是设置静态资源路径
+app.use(require("webpack-dev-middleware")(compiler, {
+    noInfo: true, publicPath: webpackConfig.output.publicPath//publicpath表示express服务器要监听的目录
+}));
+app.use(require("webpack-hot-middleware")(compiler));
+
+app.listen(9000, '127.0.0.1', function(err) {
+  err && console.log(err);//这个地址要和上面的webpack配置文件中的publicPath路径相同
+});//开启监听
+
+最后在package.json的script中把命令改成
+"server": "cross-env NODE_ENV=development node mynode.js"
+3》安装 browser-sync-webpack-plugin。使多个浏览器同步
+首先安装 npm install --save-dev browser-sync-webpack-plugin
+然后在webpack配置文件的plugins字段中增加：
+new BrowserSyncPlugin({
+    host: 'http://172.16.2.67',//在浏览器中输入的地址（本机地址）。注意：要加上http://
+    port: 9002,//在浏览器中输入的端口
+    proxy: 'http://127.0.0.1:9000/build/index.html', // 这个地址是实际要访问的文件。这里的proxy和webpack-dev-server中的proxy作用不一样，这里的proxy表示本地已经有一个server了，所以要代理一下（看有道笔记中关于browser-sync的文章），webpack-dev-server中的proxy是用来解决跨域问题的。
+    logConnections: false,
+    notify: false
+  }, {
+    reload: false
+  });
+（更多配置选项：browser-sync-webpack-plugin官网：https://www.npmjs.com/package/browser-sync-webpack-plugin
+browser-sync的options配置：http://www.browsersync.cn/docs/options/）
+最后项目运行的时候就可以看到browser-sync官网上的效果
+（实验的结果是：操作可以同步。就是在一个浏览器上输入，点击，在其他浏览器上可以同步。但是代码更改却不能同步，在本地修改代码后，本地浏览器自动热替换，但是其他设备上的显示却没有改变？？？？经实验发现webpack的配置文件中的publicPath不能写成http://localhost:9000/build(用webpack-dev-server配置自动刷新的时候要使用这个配置，见上文)，而要写成绝对路径/build/，如果还是不行，记得清缓存）
+brower-sync的调试页面仍然默认是localhost：3000
+
+9、配置rem自适应（参考文章移动端rem适配：httpwww.cnblogs.comaxl234p5156956.html.note中网易的做法）
+1、先设置meta标签
+<meta name="viewport" content="initial-scale=1, maximum-scale=1,width=device-width,user-scalable=no">
+2、在html文件中添加如下代码：
+<script type="text/javascript">
+  window.onresize = function(){
+    document.documentElement.style.fontSize = document.documentElement.clientWidth / 7.5 + 'px';
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    document.documentElement.style.fontSize = document.documentElement.clientWidth / 7.5 + 'px';
+  },false);
+</script>
+DOMContentLoaded这个事件的兼容性是：ie9+、Firefox、chrome、Safari3.1+、oprea9+
+这段代码的作用是初始化和窗口大小改变时动态设置根元素的font-size。
+上面的7.5表示设计稿的宽度（750px）除以自己选定的设计稿根元素font-size（100px这里选100是为了css计算方便，实际上有了sass后就无所谓了，反正不用人工计算）。所以具体是7.5还是多少，要看设计稿的设置。
+3、在sass工具中写一个函数
+@function rem($px) {
+  @return $px / 100 * 1rem
+}
+这个函数用于把px转换成rem单位
+上面的100就是自己选定的设计稿根元素font-size：100px
+4、在页面的sass文件中就可以这样使用：
+比如在设计稿（750px）中元素a的宽度为300px
+那么就这样设置a{width：rem（300）}
+10、图片处理
+1、引用图片
+a、本项目（huatian-mock-react-demo）中是使用的express建立的一个本地服务器，注意：这个服务器的目录是在内存中的（参看上文）。所以在文件中使用目录引用图片是不会成功的，比如在html中这样引用：
+<img src="../../assets/img/usercenter1.png"/>
+这样是得不到图片的。为什么呢？因为这张图片是在硬盘上的，而不是在express服务器的内存目录中。如果要引用该图片,要像下面这样：
+import pic form ‘../../assets/img/usercenter1.png’；
+<img src={pic}/>
+上面的第一句话就是将硬盘上的资源打包进了内存中，所以后面就可以使用了。
+
+b、但是如果图片多了，那不是每一张图片都要import一下，很麻烦，所以也可以像下面这样做：
+首先安装一个服务器，比如用nginx（下载nginx，在他的文件夹中找到conf/nginx.conf文件，把其中的server字段的port端口改成自己想要端口，比如8080，把location下的root字段改成想要的根目录，比如改成“D:/project/huatian-mock-react-demo"），启动nginx，
+现在就可以这样引用图片了：
+<img src="http://127.0.0.1:8080/assets/img/usercenter1.png"/>
+为了方便，可以把前缀定义成一个全局变量：
+var picPath=”http://127.0.0.1:8080/assets“
+<img src=picPath+"/img/usercenter1.png"/>
+同理在scss中也可以定义一个全局变量
+$picPath:'http://127.0.0.1:8080/assets';
+background: url('#{$picPath}/img/usercenter1.png') no-repeat 50% 50%/100% 100%;
+//如果变量需要镶嵌在字符串之中，就必须需要写在#{}之中。
+c、jsx中如果有img标签引用了图片，如果使用路径来加载图片，图片是不会被打包的
+比如<img src="./images/a.jpg"/>这种不会打包
+
+要这样写<img src={require（"./images/a.jpg"）}/>
+或者 import a from “./images/a.jpg”
+<img src={a}/>
+
+为了防止每次使用图片都要import该图片，可以单独创建一个文件，比如convert.js，用来专门import图片
+convert.js
+import a from “./images/a.jpg”//注意第一个引入没有大括号，后面有大括号
+export {a}
+（convert.js文件可以用nodejs自动来生成，有时间实验一下）
+
+然后，在任何要使用a.jpg的地方都可以使用了。
+import a from “convert.js”
+<img src={a}/>
+上面的a和b之间的区别就是express的服务器目录在内存中，而nginx服务器目录在硬盘中
+
+2、处理图片
+a、处理小图片
+用url-loader进行图片处理，安装url-loader
+npm install url-loader --save-dev
+
+配置config文件
+      {
+        test: /\.(png|jpg)$/,
+        loader: 'url?limit=40000'
+      }
+
+注意后面那个limit的参数，当你图片大小小于这个限制的时候，会自动启用base64编码图片。
+注意，如果图片用的是绝对路径，则不管图片有多小，都不会转换成base64。比如上面b方法的http://127.0.0.1:8080/assets/img/usercenter1.png。
+只有相对路径才会转换，比如a方法中的import进来的图片。所以如果要让所有图片都转换，则要在生产环境中将var picPath=”http://127.0.0.1:8080/assets“改成相对路径。（就是在npm run pro命令的时候把picPath改过来）
+b、生成css sprite
+c、使用svg sprite
+11、配置gulpfile.js（按需求加入功能）
+12、加入react-router（主要参考阮一峰教程）
+
+4.x版本有很大的不同，具体看官网：https://reacttraining.com/react-router/core/guides/quick-start
+
+1、安装
+cnpm install --save react-router
+以这种方式安装的是最新版本的。实验中发现，如果要使用hashHistory，只能使用3.x版本的react-router，也就是说要像阮一峰教程中的方式使用会报错“can't read ‘location’ of undefined”。
+import { Router, Route, hashHistory } from 'react-router';
+	render((
+	  <Router history={hashHistory}>
+	    <Route path="/" component={App}/>
+	  </Router>
+	), document.getElementById('app'));
+如果要使用上面的方式，则要在package.json中将react-router的版本号改成3.x。
+所以要经常关注官网上的更新，按照官网的指导进行配置
+2、路由跳转
+参考页面跳转.note
+3、require.ensure按需加载
+参考react-router按需加载.note
+4、用onEnter属性进行跳转前验证
+参考阮一峰教程react-router阮一峰教程.note
+13、加入redux。（主要参考阮一峰教程）
+（0）为什么要用redux，参考react使用和不使用redux的不同（个人总结）.note
+（1）安装redux：
+npm install --save-dev react-redux
+npm install --save-dev redux
+（2）配置：
+1）createStore（reducer）创建store
+2）写reducer，才能传入上一步中的createStore函数中，如果项目较大，可以通过combineReducers来拆分reducer，reducer接受两个参数，一个是整个应用的state，一个是action。对于state，要先定义一个初始化的state，否则reducer还没有填充store之前，state是undefined，会报错。
+3）store.dispatch()分发action，如果用了react-redux，就直接用mapDispatchToProps方法来dispatch。store会根据createStore中的reducer来处理action
+4）用store.getState()来获取state，如果使用了react-redux，就直接用mapStateToProps方法中指定的属性直接获取（注意：是按照combineReducer中定义的名字来获取的，不是按照state中的名字来获取的。比如有两个组件A和B，
+整个应用的state为
+state：{componentA：1，componentB：2}。
+combineReducer为
+const chatReducer = combineReducers({
+	  reducerA,
+	  reducerB
+	})
+那么在A组件中要这样取自己的state：
+const mapStateToProps = (state) => {
+  return {
+    state: state.reducerA//组件的子state名字是在combineReducer中定义的
+//而不是 state: state.componentA
+  }
+};）。
+14、加入mockjs。
+1、安装
+2、调用Mock.mock（）方法
+15、性能优化。
+1、webpack按需加载
+2、webpack提取公用的模块
+3、shouldComponentUpdate
+4、pureRendermixin
+5、immutablejs
+
+
+
