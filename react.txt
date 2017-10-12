@@ -1,4 +1,4 @@
-react事件
+一、react事件
 
 除了onClick事件，react还支持哪些事件？
 1、在jsx中写
@@ -7,15 +7,19 @@ react事件
 有哪些常用事件呢：http://www.cnblogs.com/mabylove/p/6873506.html
 
 2、用dom的事件绑定方法
-请在componentDidMount方法中绑定事件 componentWillUnmount方法中解绑事件。React通过ref拿到原始DOM通过addEventListener的方法监听事件
+请在componentDidMount方法中绑定事件 componentWillUnmount方法中解绑事件。
+
+React通过ref拿到原始DOM通过addEventListener的方法监听事件
 
 
-enter发送消息，ctrl+enter换行
+二、enter发送消息，ctrl+enter换行
 
 <textarea placeholder="我想说....." ref="input" onKeyDown={
                                 (e)=>{
                                     if(e.keyCode==13&&e.ctrlKey) {
-                                        this.refs.input.value=this.refs.input.value+'\r\n'
+                                        
+
+this.refs.input.value=this.refs.input.value+'\r\n'
                                     }
                                     if(e.keyCode==13&&!e.ctrlKey){
                                         e.preventDefault();
@@ -24,6 +28,176 @@ enter发送消息，ctrl+enter换行
                                 }
                             }></textarea>
 
-发送到服务器的\r\n，如果再在浏览器取回，也是可以取回的，只不过有的标签会自动去除\r\n，所以要把内容放到<pre></pre>中
+发送到服务器的\r\n，如果再在浏览器取回，也是可以取回的，只不过有的标签会自
+
+动去除\r\n，所以要把内容放到<pre></pre>中
 
 
+三、获取input或textarea的值
+1、使用ref属性，this.refs.name.value来获取值。
+
+
+2、使用事件处理函数，用event.target.value来获取值，用onChange方法来改变值
+
+。
+
+
+四、ref属性的问题
+
+如果输入框用ref取值，那么该值用split方法始终会得到空数组，暂时没发现怎么回
+
+事。用event.target.value来取值就不会出错
+实际使用中还发现一个问题：
+<div contenteditable="true" onPaste={(e)=>this.onpaste(e.target)}></div>
+onpaste(dom){
+	setTimeout(()=>{console.log(dom.innerHtml)},1)
+}
+这个时候得到的innerHTML总是空，如果用ref方法就不会报错。
+
+
+五、jsx中元素的style属性
+1、style要写成对象，不能写成字符串
+2、所有用短线连接的属性名都要改成驼峰形式。
+如下所示：
+<li style=
+
+{{paddingTop:'20px',textAlign:'center',cursor:'pointer',color:'#22bdf6',te
+
+xtDecoration:'underline'}}>添加联系人</li>
+
+六、如何在react组件中定义变量
+一般情况下可以在组件中定义方法：
+class ChatChat extends Component {
+constructor（）{//这是组件自带的方法  
+super（）
+}
+method(){//这是用户自定义的方法  
+}
+render（）{//这是组件自带的方法  
+}
+那么如何在组件中定义变量呢？
+下面这种方法会出错：
+class ChatChat extends Component {
+constructor（）{//这是组件自带的方法  
+super（）
+}
+userValue：“aaa”
+method(){//这是用户自定义的方法  
+}
+render（）{//这是组件自带的方法  
+}
+
+方法一、在constructor中定义，，就像定义this.state一样。这样定义的变量，当
+
+组件刷新的时候，变量是不会变成初始化的值，比如我们的组件A：
+constructor(){
+        super();
+        this.state = {
+            
+        }
+        this.userData={position:0}//我们自己定义的变量
+    }
+然后我们在某个元素单击的时候改变该变量：
+onClick={(e)=>{e.stopPropagation();this.userData.position = 2}}
+组件B引用了组件A，当B组件render的时候，A组件也会render，但是我们自己定义的
+
+变量position并不会变成初始化的0，而是继续保持为2.（因为我们自定义的变量并
+
+不会引起A组件render，所以变量不会自动初始化为0）
+
+方法二、在class外部定义
+const prefix=“aaa”；
+class ChatChat extends Component {。。。}
+
+七、给react元素设置innerHTML
+用dangerouslySetInnerHTML这个属性：dangerouslySetInnerHTML={{__html: 
+
+this.state.html}}
+https://www.douban.com/note/526007824/
+http://www.cnblogs.com/rubylouvre/p/4559969.html
+
+
+八、如何在react中的img中使用相对路径来引用图片
+一般情况下，当在一个组件中要引用图片时，都是通过import方式引入：
+import {aaa} from ‘./aaa.jpg'
+<img src={aaa}/>
+
+下面这种相对路径的方式会出错：
+<img src=‘./aaa.jpg'/>
+
+下面这种绝对路径的方式则不会出错：
+<img src=‘http://www.baidu.com/aaa.jpg'/>
+
+如果要使用相对路径，则要把图片文件夹放在html文件的目录下（根目录）
+index.html
+imgs/aaa.jpg
+
+<img src=‘/aaa.jpg'/>
+这样就不会出错了。
+
+九、如何在组件初始化的时候就把props传递给state
+这样：
+constructor（props）{
+	this.state={
+		name：props
+	}
+}
+
+十、当接收到新的props的时候，如何使组件重新渲染
+用componentWillReceiveProps（）方法
+
+十一、下面这种情况，Component组件不会重新渲染
+trueOrFalse？<Component prop1={a} prop2={b}/>:<Component prop3={c} prop1=
+
+{a} prop2={b}/>
+如果想Component重新渲染，名字不能相同。
+
+
+十二、父组件调用子组件的方法：
+方法一、用ref
+Parent{
+	func1（）{
+		this.ref.child.func2();
+	}
+	render（）{
+		return（
+			<Child ref="child" onClick={this.func1}/>
+		）
+	}
+}
+Child{
+	func2（）{}
+}
+方法二、
+const objectTemp = {}；
+Parent{
+	func1（）{
+		if(objectTemp.method){
+		objectTemp.method();
+		}
+	}
+	render（）{
+		return（
+			<Child parentFunc={objectTemp} onClick=
+
+{this.func1}/>
+		）
+	}
+}
+Child{
+	func2（）{}
+	render（）{
+		this.props.parentFunc.method = this.func2;
+		return（
+			<div></div>
+		）
+	}
+}
+
+
+十三、mixin
+https://segmentfault.com/a/1190000002704788
+
+十四、高阶组件 HOC
+http://www.cnblogs.com/libin-1/p/7087605.html
+https://segmentfault.com/a/1190000009386662
