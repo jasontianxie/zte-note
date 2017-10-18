@@ -1,0 +1,24 @@
+1、dotenv模块
+这个模块可以在文件中存储环境变量。之前设置环境变量一般都是这样的：
+在package.json文件的scripts字段中设置
+"start": "cross-env NODE_ENV=development",
+
+现在可以在项目的根目录下创建一个.env文件，然后在文件中写入变量，就可以在代码中直接使用process.env.varibles来访问了。
+
+
+2、passport模块
+nodejs服务端用来做认证功能的。
+1)首先用passport.use方法进行配置，该方法的第一个参数是一个对象（可选），usernameField的值默认是“username”，passwordField的默认值是“password”，他们对应的是客户端（浏览器）通过POST方式发送过来的字段的名字。比如说客户端（浏览器）发送过来的是{username：“张三”，password：“12345”}，那么上面的usernameField字段就设置成“username”，passwordField设置成“password”。
+当然usernameField和passwordField都是可以改的，如果改了，那么客户端也要进行相应的修改。
+
+2）用passport.authenticate方法调用认证。该方法的第一参数是策略的名字，具体是什么名字，要看你用的什么策略，策略查询在这里：http://passportjs.org/features。点击进入策略就可以看到相关配置。
+
+3）passport-local策略是本地认证策略，除此之外还有很多其他的认证策略，比如twitter，Google，Facebook策略。他们之间有什么不同呢？本地策略就是登录自己注册的网站所用的认证方式。而其他的策略有的是用的Oauth方式，这个方式平时常见的就是比如你要新访问一个网站，但是他要你先注册，这时你可以选择用qq登录或者微信登录
+
+
+https://github.com/settings/applications/new
+https://www.zhihu.com/question/19781476
+http://www.ruanyifeng.com/blog/2014/05/oauth_2_0.html
+
+3、csurf模块
+用来防范csrf攻击
