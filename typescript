@@ -1,0 +1,27 @@
+https://www.tslang.cn/docs/handbook/type-inference.html
+http://www.jqhtml.com/8110.html
+
+
+
+
+声明文件
+http://www.jqhtml.com/8110.html
+http://www.cnblogs.com/ys-ys/archive/2016/03/24/5314693.html
+https://segmentfault.com/a/1190000009247663
+
+.d.ts文件和interface等类型的区别:
+.d.ts文件是声明一些变量，并为这些变量规定一些类型，然后在同名的ts文件中相应的变量就要遵守这些规则。
+而interface等类型只是表示类型。
+也就是说d.ts文件范围更广一些。d.ts文件中可以包含interface等类型。比如说
+interface Person {
+	name：string，
+	age：number
+}
+
+declare var a：Person
+
+
+一些符号的说明：
+<>:泛型
+implements：类类型用implements调用接口interface，其他的用冒号
+（https://www.tslang.cn/docs/handbook/interfaces.html）
