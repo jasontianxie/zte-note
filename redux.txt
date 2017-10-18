@@ -1,4 +1,4 @@
-mapStateToProps 函数里面的state是全局state，就是总state
+1、mapStateToProps 函数里面的state是全局state，就是总state
 
 而每个组件的reducer函数得到的state是自己state，就是子state
 
@@ -50,3 +50,20 @@ const mapDispatchToProps = (
         }
     };
 }
+
+2、redux的action对象的属性可以自己命名，也可以有多个，比如一般的action是这样的：
+action：{type：‘’，payload：‘’}
+其实完全可以随意定
+action：{type：‘’，name：‘’，actionName：‘’}
+不知道type属性可不可以改，还没有试过。
+
+
+3、有了redux，那么哪些状态应该写在redux中，哪些又该写在state中呢？
+下面是作者的原话：
+Use React for ephemeral state that doesn't matter to the app globally and doesn't mutate in complex ways. For example, a toggle in some UI element, a form input state. Use Redux for state that matters globally or is mutated in complex ways. For example, cached users, or a post draft.
+
+Sometimes you'll want to move from Redux state to React state (when storing something in Redux gets awkward) or the other way around (when more components need to have access to some state that used to be local).
+
+The rule of thumb is: do whatever is less awkward.
+大概意思就是：一些简单的内部状态，比如说元素的显示或隐藏，输入框内容的改变等就用state来保存。而那些会影响其他组件行为的状态，比如说在A组件中点击了一个按钮，会跳转到B组件，同时B组件中的文字变成红色，如果在A组件中点击了另一个按钮，也会跳转到B组件，但是B组件中的文字变成蓝色。这个时候就用redux来保存。还有一种情况，就是逻辑比较复杂的运算，应该放在redux中，比如，如果我在state中保存了一个变量，当要改变这个变量的时候，计算很复杂，那么就会在组件中定义一个很长很复杂的方法来处理。这样组件看起来代码就很多很乱。如果放在redux中，那么组件中只需要用dispatch就行了，之前那个很长很复杂的方法可以分离到reduer中去处理。代码看起来更整洁了。也更符合mvc的分离思想：页面内容放在一块（组件），控制放在一块（reducer），数据放在一块（store）
+总之一句话，让自己的逻辑越简单越好。
