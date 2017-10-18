@@ -33,6 +33,11 @@ v2：http://webpack.github.io/docs/webpack-dev-server.html
 7.7、openBrowser--opn：https://www.npmjs.com/package/opn）--》
 8、config--》
 9、webpack.config.dev.js
+10、
+10.1 autoprefixer为不同的浏览器的css增加前缀。
+10.2 case-sensitive-paths-webpack-plugin在使用require引入模块的时候，路径强制大小写敏感，如果大小写不敏感，在OSX系统中可能会带来麻烦。
+10.3 InterpolateHtmlPlugin这是react-create-app自己封装的一个plugin，作用就是可以在html中使用变量，具体看react-dev-utils/interpolalteHtmlPlugin.js中的注释说明。
+10.4 WatchMissingNodeModulesPlugin这是react-create-app自己封装的一个plugin，作用是当使用npm install安装一个模块的时候，项目会自动重新构建，具体看react-dev-utils/WatchMissingNodeModulesPlugin.js中的注释说明
 
 node-sass-chokidar：安装 npm install --save node-sass-chokidar
 npmjs地址：https://www.npmjs.com/package/node-sass-chokidar
