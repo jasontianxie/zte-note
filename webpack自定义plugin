@@ -1,0 +1,56 @@
+https://webpack.js.org/development/how-to-write-a-plugin/
+
+https://webpack.js.org/api/plugins/
+
+http://www.cnblogs.com/haogj/p/5649670.html
+
+http://www.cnblogs.com/sampapa/p/6958166.html
+
+1、tapable
+tapable是一个小型的库，使你可以添加并应用plugin到js模块中，它可以被继承或是mixed到其他模块中。它有点像nodejs中的EventEmitter类，专注于事件的发射和处理。但是，它不止这点功能，tapable还允许你通过回调函数的参数来访问事件的emittee（发射者）和producer（产生者）
+
+tapable有四组成员函数：
+plugin：主要是用来注册事件。
+apply：主要是应用事件监听函数。
+applyPlugins：主要用来发射事件（emit）
+mixin：用mixin的方式来扩展tapable，而不是用原型方式扩展。
+
+
+2、compiler
+compiler是主引擎，它通过webpack cli或者webpack api或者webpack的配置文件来生成compilation的实例。
+
+使用方式是先实例化，然后调用run方法。
+
+compiler是一个tapable的实例。我们的意思是，它能自动注册和调用plugin。compiler的主要功能有下面这些：
+1、通常会有一个主compiler的实例，子compiler被创建出来处理特定的任务
+2、。。。
+
+观察模式
+支持观察模式，当文件改变的时候会自动rebuild，在开发模式下，比如使用webpack-dev-server时，会很方便。
+
+支持“多编译器”
+该模块使webpack支持多个配置文件。当使用nodejs API配置webpack，如果配置是一个数组那么在每个配置文件调用完成后会调用回调函数进行后续处理
+
+
+3、compilation
+compilation实例扩展于compiler。它表示每一个require进来的模块的编译结果。比如：a.js中require“b.js”；require“c.js”。那么就会有两个compilation实例分别表示b.js和c.js编译后的结果。每个compilation会做一系列工作，比如：loaded、sealed、optimized、chunked等。
+
+
+
+
+一、compiler表示的是webpack的主环境（可以把compiler看成是webpack本身）
+每个插件都有一个apply方法，插件调用apply的时候就会传入compiler对象，然后compiler就可以监听各种事件（https://webpack.js.org/api/plugins/compiler/）页面中有一张表格，表格中事件的type为async的表示支持异步，则在回调函数中可以传入callback函数：比如
+emit事件，在表中的参数为compilation，但是支持异步，所以调用的时候还可以传入callback。像下面这样：
+compiler.plugin("emit", function(compilation, callback) {
+  // Do something async...
+  setTimeout(function() {
+    console.log("Done with async work...");
+    callback();
+  }, 1000);
+});
+
+plugin也可以通过compiler定义自己的事件（https://webpack.js.org/api/plugins/tapable/）
+用applyPlugin*方法来发出事件，用plugin方法来监听事件，并进行处理
+
+二、compilation表示“编译过程”对象
+webpack的作用就是打包编译各种文件。那么在这个打包编译过程中的各种信息就保存在compilation对象中。比如a.js引用了b.js和c.js。那么webpack在把b.js和c.js打包时，compilation对象就会保存相关信息，比如输入的文件名（b.js、c.js）、输出的文件名、b.js或c.js又引用了哪些其他模块、等等信息，有了这些信息。就可以在我们自己的plugin中进行进一步处理了。
