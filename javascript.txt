@@ -1,0 +1,14 @@
+1、如何给事件处理程序传递参数。
+
+onClick=function（args）{return function（event）{
+	console.log（event）；
+	console.log（args）；
+
+}}（myparams）
+
+2、数组的fileter方法问题
+
+filter方法会过滤原数组中的一部分元素，并返回一个新数组。实际工作中遇到的问题是，如果数组中的元素是引用类型，那么原数组和新数组内的元素是引用的同一个。比如说：
+原数组：a:[{first:'name',second:'nickname',class:'one'}]
+过滤后：b:[{first:'name',second:'nickname'}]
+那么当改变b中元素的内容后，a中的相对应的元素也会改变。b[0].first='first name'.console.log(a[0].first)//first name
