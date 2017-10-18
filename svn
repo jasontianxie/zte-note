@@ -1,0 +1,16 @@
+1、更新时出现locked的情况
+
+1.出现这个问题后使用“清理”即"Clean up"功能，如果还不行，就直接到上一级目录，再执行“清理”，然后再“更新”。
+
+2.如果还是不行，clean up的时候勾选上break lock，再clean up
+
+3.有时候如果看到某个包里面的文件夹没有SVN的标志，直接用“Ctrl+Delete”手工删除，然后“清理”，最后“更新”或“提交”。
+
+4.有时候有的文件死活无法提交和更新，有lock字样的提示，：首先点击该文件，然后getLock,再选中stealLock,然后release lock即可
+
+5.教大家最狠的一招，在项目中如果是出现某个文件死锁的情况无法解决的情况下，叫开发中所有的人把文件上传了解锁了，清空版本库地址：安装目录:SvnTracsvnprojectsdblocks这个文件夹路径里面的全部内容。一切ok!
+
+提示：
+
+Subversion1.3.2，开启匿名访问的同时利用authz功能限制匿名访问，则会出现check out 时提示被LOCK的现象
+转自Gimhoy's Blog：http://blog.gimhoy.com/archives/svn-locked-solution.html
