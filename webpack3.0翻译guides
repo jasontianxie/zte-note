@@ -1,0 +1,6 @@
+caching
+说了三个问题
+1、通过设置hash或者chunkhash来解决开发时的缓存问题
+2、通过CommonsChunkPlugin来提取公共模块，如果CommonsChunkPlugin的名称和entry中的名称不同，那么就是提取公共模块，如果相同，那么就是将该入口文件提
+取出来。
+3、在方法1中的缓存问题解决的不完美，因为加上hash后所有的文件都会被刷新，影响了性能，我们只想让被改了的文件被刷新。所以提出了使用 NamedModulesPlugin或 HashedModuleIdsPlugin这两个方法来解决。
