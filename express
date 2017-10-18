@@ -1,0 +1,102 @@
+一、
+app.use()用来定义中间件，第一个参数是匹配的路径，如果不指定，则匹配“/”。
+第二个参数是中间件函数，中间件函数接受三个参数，分别是请求，应答和next，其中next表示的是调用下一个中间件。
+
+为什么next有这个功能呢？因为中间件的调用是按照代码中的顺序来的，比如说
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+这里定义了四个中间件，那么他们会按照顺序从上到下运行，前提是每一个被调用的中间件都调用了next（）。如果有一个被调用的中间件没有调用next（），那么后面的中间件都不会执行。
+
+再看下面的情况：
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+app.get(/\/movie\/hot\//, routes.hot);
+app.get(/\/movie\/cinema\//, routes.cinema);
+app.get(/\/movie\/info\//, routes.info);
+
+app.get方法的第二个参数也可以看成中间件，它和app.use的区别是它没有next方法。按照上面的说法如果app.get(/\/movie\/hot\//, routes.hot);没有调用next方法，后面的app.get都不会执行。其实不是这样的，上面的说法中提到了要“被调用”的中间件没有调用next方法，后面的才不会执行。所以如果app.get没有匹配到路由，那么是不会“被调用”的，所以即使他没有调用next，也不会影响后面的代码。
+
+最后，当所有匹配都处理完了再进行错误处理。
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+app.get(/\/movie\/hot\//, routes.hot);
+app.get(/\/movie\/cinema\//, routes.cinema);
+app.get(/\/movie\/info\//, routes.info);
+
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
+
+二、
+res.render（view，locals，callback）。第一个参数view是模板文件的文件名，express的模板文件放在views文件夹下。第二个参数locals是为模板文件设置的数据对象（可选）。
+
+
+三、
+var express = require(‘express’);
+var app = express();
+app.listen(3000);
+
+和
+var express = require(‘express’);
+var http = require(‘http’);
+var app = express();
+
+http.createServer(app).listen(80);
+
+利用http 模块创建的server有什么区别吗？
+
+
+答案：http://cnodejs.org/topic/5396cd60c3ee0b5820f00e2a
+
+实际上第一种方法就是对第二种方法的封装。用第二种方法更加灵活（不但可以用express的方法，还可以用http模块的方法，第一种只能用express的方法）。
+
+
+四、
+req.params表示的是客户端请求路径中的参数，比如：
+app.post('/register/:apiVersion/:userId/sessions.json', function (req, res) {
+	console.log（req.params.apiVersion）；
+	console.log（req.params.userId）；
+})
+上面两个console得到的就是路径中的参数变量的值。
+还有一个方法req.param（），在4.x中已经废弃。
+
+五、
+http://www.expressjs.com.cn/4x/api.html#app.param
+
+app.param()第一个参数是路径中客户端带过来的参数，比如：app.get('/user/:id', function (req, res, next) {
+  console.log('although this matches');
+  next();
+});
+那么app.param(‘id’，function（）)中的第一个参数就是上面app.get方法路径中的：id。第一个参数也可以是数组，如果是数组，就表示了路径中的所有参数。比如：app.get('/user/:name/:id', function (req, res, next) {
+  console.log('although this matches');
+  next();
+});
+那么app.param([‘name’，‘id’]，function（）)
+app.param()第二个参数是回调函数，有四个参数，最后一个参数id就是app.param()第一个参数的值。如果app.param()的第一个参数是数组，则第二个回调函数会作用到数组中的每一个成员。
+
+
+
+六、res.end（）
+这个方法用于立即停止请求。比如客户端有一个请求过来，如果服务器没有用res.send或者res.json等方法回应，那么客户端会一直等待，直到超时。这个时候就可以用end方法来让客户端停止等待。
+
+
+
+七、body-parser
+当请求头中包含content-encoding的时候，可能会返回415.（实际中发现，inflate默认都是true，编码方式也是utf-8（content-encoding：utf-8），还是会返回415？？？不知道怎么回事,现在的解决方法是要么在请求头中去掉content-encoding字段，要么服务端去掉body-parser,body-parser官网中还介绍了另外两种解析器body和co-body）
+body-parser在npmjs官网中有说明各种错误的原因。
+
+
+八、处理文件
+http分为请求行，消息报头，请求正文。
+请求正文就是body-parser要解析的内容，被解析的正文有各种格式（MIME），所以body-parser也有各种选项，比如json 、raw、url-encoded等。如果要解析客户端上传的文件，（如果文件很大，文件会被http协议分割，然后一个片段一个片段的传输，最后再进行组装，组装好了，再给其他模块使用，比如multer）可以用multer模块（http://www.expressjs.com.cn/4x/api.html#req.body）。
+multer：https://github.com/expressjs/multer/blob/master/doc/README-zh-cn.md
