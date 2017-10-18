@@ -1,0 +1,45 @@
+1、react-free-scrollbar，react-custom-scrollbars等（npm中搜索“react scrollbar”）
+1）react-free-scrollbar认为滚动条宽度为15px
+2）react-custom-scrollbars认为滚动条宽度为17px（好像大多数为17px）
+	2.1）可以按照例子（spring-scroll）中的代码来设定滚动条的位置（http://malte-wessel.github.io/react-custom-scrollbars/）。可以直接使用scrollTop方法，也可以加上spring。加上spring后滚动条的滚动有动画效果，没加spring就没有动画效果（我猜的）。
+我在代码中是这样用的：
+<Scrollbars ref="scrollbar" autoHide autoHideTimeout={500} style={{ width: '100%', height: '100%' }}>
+                        {<ChatList history={chatHistory}/>}
+                    </Scrollbars>
+然后在update中调用：
+componentDidUpdate(nextProps,nextState){
+        this.refs.scrollbar.scrollToBottom()
+    }
+
+
+react的自定义滚动条
+
+
+2、sweetalert-react，react-alert等（npm中搜索“react alert”）
+react提示框
+1）react-alert的位置暂时只有四个，不能在页面居中
+2）sweetalert-react记得引入样式，（import ‘sweetalert/dist/sweetalert.css’）
+
+
+3、react-model
+模态框
+
+4、@beisen/ToolTip
+行内元素提示功能。
+
+5、bindme
+bind方法。可以替换this.function=this.function.bind(this)
+
+6、pinyin
+汉字-拼音转换工具。
+工作中使用该工具进行了按首字母排序：
+groups.sort((a,b)=>{
+                return pinyin(a.id)>pinyin(b.id);
+            });
+其中groups为以下这种形式：
+groups=[{id:"张三",nickName:"abc"},{id:"李四",nickName:"def"},{id:"小明",nickName:"ghi"}]
+
+
+7、图片处理 gm
+http://blog.csdn.net/dreamer2020/article/details/51647885
+https://stackoverflow.com/questions/18463559/how-to-do-composite-with-gm-node-js
