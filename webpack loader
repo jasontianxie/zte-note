@@ -1,0 +1,3 @@
+test: /\.less$/,loader: 'style-loader!css-loader!sass-loader'
+
+这个配置文件翻译过来就是，遇到.sass结尾的文件，首先用sass-loader翻译成css，再把css文本传入css-loader，来处理@import和url()等情况，再把结果传给style-loader，在最终的html文件中加入style标签。
