@@ -1,14 +1,16 @@
-1��jsx�������img��ǩ������ͼƬ�����ʹ��·��������ͼƬ��ͼƬ�ǲ��ᱻ�����
-����<img src="./images/a.jpg"/>���ֲ�����
-Ҫ����д<img src={require��"./images/a.jpg"��}/>
+1、jsx中如果有img标签引用了图片，如果使用路径来加载图片，图片是不会被打包的
+比如<img src="./images/a.jpg"/>这种不会打包
+要这样写<img src={require（"./images/a.jpg"）}/>
 
-���� import a from ��./images/a.jpg��
+或者 import a from “./images/a.jpg”
 <img src={a}/>
 
-Ϊ�˷�ֹÿ��ʹ��ͼƬ��Ҫimport��ͼƬ�����Ե�������һ���ļ�������convert.js
-import a from ��./images/a.jpg��//ע���һ������û�д����ţ������д�����
+为了防止每次使用图片都要import该图片，可以单独创建一个文件，比如convert.js
+import a from “./images/a.jpg”//注意第一个引入没有大括号，后面有大括号
 export {a}
 
-Ȼ��
-import a from ��convert.js��
+然后
+import a from “convert.js”
 <img src={a}/>
+
+2、用require.ensure按需加载的时候require('./pages/blankAlert/index').default，有时候要加.default,这是因为组件使用es6语法export default 命令导出的，而不是用module.exports方法导出的。
