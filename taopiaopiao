@@ -1,0 +1,15 @@
+用到的功能模块
+
+1、yargs
+
+作用：//可以在nodejs应用程序内部访问node命令行参数。比如一个app.js文件，用node运行：node app.js --aaa=4。那么在app.js内部就可以用yargs取到aaa变量。
+
+参考：http://yijiebuyi.com/blog/a3ea13c5d7a40ac9cb55e2f29d5f4619.html
+
+2、debug
+
+
+3、express-http-proxy
+
+4、fs-extra
+这个模块是对nodejs自带的fs的增强，如果用了这个模块就可以不用nodejs自带的fs模块了，fs-extra增加了对promise的支持，增加了mkdirp，rimraf，ncp等功能
