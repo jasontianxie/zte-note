@@ -1,0 +1,12 @@
+1、按需加载
+什么是按需加载：http://cnodejs.org/topic/586823335eac96bb04d3e305
+
+
+webpack在打包的时候如果遇到require.ensure语句，就会认为这个是个分离点，分离点里面指定的文件不会打包到主文件中，而是会单独打包出来，打包出来的文件名字就是在output.chunkFilename中指定的。(官网上现在是用import函数，注意，这个import函数和文件头部的import外部模块的功能不一样)
+
+
+按需加载的时候要用到output.chunkFilename   http://react-china.org/t/webpack-output-filename-output-chunkfilename/2256
+
+2、提取公共模块
+CommonsChunkPlugin
+其他优化方案：https://segmentfault.com/a/1190000007891318
