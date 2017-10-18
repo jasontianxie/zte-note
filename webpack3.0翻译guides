@@ -1,6 +1,155 @@
+
+
+
+Tree Shaking
+这个功能就是清除没有被用到的代码，比如说：
+a.js中export出了两个函数plus和subtract，b.js用import引入了a.js，但是b.js中
+
+只用了a.js中的plus函数，subtract函数没有用，这个时候subtract还是被打包进来
+
+了，subtract就叫做dead code。webpack可以清除没有用的subtract的代码，减小最
+
+终打包后的代码的大小。
+结论：要使用Tree shaking
+1、用es2015的模块语法，比如import和export
+2、用UglifyJSPlugin来清除dead code
+
+
+
+Code Splitting
+这个功能叫做代码分割，有几种方式实现代码分割
+1、多入口
+配置多入口后，output可以生成多个js文件而不是一个大的js文件，从而实现了分割
+2、提取公共代码
+使用 CommonsChunkPlugin
+3、动态导入
+3.1使用import函数，注意：这个import和模块导入的import不一样。（具体用法查
+
+看官网的api），import中要指定chunkname是在注释中指定的。
+3.2使用require.ensure方法
+4、推荐了一些打包的分析工具
+4.1webpack-chart
+4.2webpack-visualizer
+4.3webpack-bundle-analyzer
+
+
+Lazy Loading
+这个功能也是Code splitting，只不过是更高级的Code splitting。在Code 
+
+splitting举的例子中，页面加载的时候会去请求模块。这里有个问题，就是在用户
+
+没有交互的时候也会加载模块，导致了性能降低。lazy loading就是只有当用户有交
+
+互的时候才会加载模块。
+比如：在code splitting中加载按钮的时候同时会加载按钮的onClick的处理函数（
+
+模块）。但是在lazy loading中会先加载按钮，当用户点击按钮的时候才会去加载
+
+onClick的处理函数（模块）这样就使页面的加载速度加快了。
+
+
 caching
 说了三个问题
 1、通过设置hash或者chunkhash来解决开发时的缓存问题
-2、通过CommonsChunkPlugin来提取公共模块，如果CommonsChunkPlugin的名称和entry中的名称不同，那么就是提取公共模块，如果相同，那么就是将该入口文件提
+2、通过CommonsChunkPlugin来提取公共模块，如果CommonsChunkPlugin的名称和
+
+entry中的名称不同，那么就是提取公共模块，如果相同，那么就是将该入口文件提
 取出来。
-3、在方法1中的缓存问题解决的不完美，因为加上hash后所有的文件都会被刷新，影响了性能，我们只想让被改了的文件被刷新。所以提出了使用 NamedModulesPlugin或 HashedModuleIdsPlugin这两个方法来解决。
+3、在方法1中的缓存问题解决的不完美，因为加上hash后所有的文件都会被刷新，影
+
+响了性能，我们只想让被改了的文件被刷新。所以提出了使用 NamedModulesPlugin
+
+或 HashedModuleIdsPlugin这两个方法来解决。
+
+
+shimming
+
+shimming主要使用来处理兼容性的，两种情况要用shimming
+
+1、有的模块会导出export全局变量（不推荐使用全局变量），比如说jQuery就会导
+
+出全局变量$。这些会导出全局变量的module叫做 broken modules。这个时候就要用
+
+shimming处理
+2、为了让更多的浏览器支持你打包后的文件（兼容性考虑），你需要按需加载一些
+
+polyfill。
+
+对于上面的第1种情况：
+我们可以使用ProvidePlugin这个来解决。比如说loadash，如果我们在
+
+ProvidePlugin中配置了loadash，那么loadash就可以当做全局变量来使用了，而不
+
+必在每个要用到的文件中import一次（import _ from 'lodash'）。更进一步的使用
+
+是：如果我们只使用loadash中的某个函数join，那么我们也可以在ProvidePlugin中
+
+配置
+plugins: [
+      new webpack.ProvidePlugin({
+       join: ['lodash', 'join']
+      })
+    ]
+那么我们就可以在项目的任何地方使用join方法了，就好像join是全局的一样。而且
+
+这种配置也可以实现上面说到Tree shaking功能，减少dead code。
+
+Granular Shimming
+还有一种情况要注意，如果模块中使用了this对象（一般都是一些老旧的模块），那
+
+么当这个模块用在commonjs中的时候可能会有问题，因为在commonjs中this指向的是
+
+module.exports而不是window。所以这个时候要额外配置一个import-loader（详见
+
+官网https://webpack.js.org/guides/shimming/中的Granular Shimming）
+
+Global Exports
+有的模块包含了全局变量，我们可以使用exports-loader把他们变成模块变量。比如
+
+官网中举的例子：global.js中的file和helpers都是全局变量，配置了exports-
+
+loader后，就可以像使用模块变量一样使用了（import { file, parse } from 
+
+'./globals.js'）
+
+对于上面的第2种情况：
+如果打包出来的js要兼容更多的浏览器。那么可能要使用polyfill。为什么呢？比如
+
+fetch或object.assign方法在老浏览器中是不支持的，那么就要使用polyfill来转换
+
+。
+一个简单的方法就是直接在打包的文件中使用import ‘babel-polyfill’。但是对
+
+于新浏览器，这些polyfill是不必要的，增大了打包后的文件大小。所以对于
+
+polyfill要按需加载。官网中的方法是，把polyfill单独打包成一个js文件，然后在
+
+js中判断浏览器的兼容性，按需加载polyfill。
+
+
+Further Optimizations
+这个说的是进一步优化方法。
+babel是一个转码器。在不做优化的情况下，babel会引入所有的polyfill并转码。但
+
+是如果用了babel-preset-env这个配置，那么babel会根据你设置的环境来加载所需
+
+的polyfill，不需要的就不会加载。
+比如说，不优化的时候，import ‘babel-polyfill’会加载所有的polyfill。
+使用babel-preset-env优化后，webpack会根据环境配置（比如你的网站要求的兼容
+
+性是ie10以上）把import ‘babel-polyfill’转化成只需要的那几个polyfill：
+import 'core-js/modules/es7.string.pad-start';
+import 'core-js/modules/es7.string.pad-end';
+import 'core-js/modules/web.timers';
+import 'core-js/modules/web.immediate';
+import 'core-js/modules/web.dom.iterable';
+要使用babel-preset-env，需要把useBuiltIns选项配置成true，如何配置？看这里
+
+https://github.com/babel/babel-preset-env#options，搜索useBuiltIns
+
+其他工具
+看官网（主要是用来处理老旧的模块）
+
+
+Authoring Libraries
+这个功能是告诉用户如何编写库，webpack不光可以打包webapp还可以打包库
