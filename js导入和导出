@@ -1,0 +1,75 @@
+1、es6:
+import ... from ...
+export
+
+2、require.js nodejs webpack:
+
+var ... = require(...)
+module.exports = ...
+exports是module.exports的引用
+
+3、typescript
+export=
+import ... = require()
+
+
+
+
+一、SimpleModule.ts
+
+复制到剪切板
+import m = require("mod");
+export let t = m.something + 1;
+AMD / RequireJS SimpleModule.js
+
+复制到剪切板
+define(["require", "exports", "./mod"], function (require, exports, mod_1) {
+    exports.t = mod_1.something + 1;
+});
+
+二、CommonJS / Node SimpleModule.js
+
+复制到剪切板
+let mod_1 = require("./mod");
+exports.t = mod_1.something + 1;
+
+
+三、UMD SimpleModule.js
+
+复制到剪切板
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        let v = factory(require, exports); if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "./mod"], factory);
+    }
+})(function (require, exports) {
+    let mod_1 = require("./mod");
+    exports.t = mod_1.something + 1;
+});
+
+
+四、System SimpleModule.js
+
+复制到剪切板
+System.register(["./mod"], function(exports_1) {
+    let mod_1;
+    let t;
+    return {
+        setters:[
+            function (mod_1_1) {
+                mod_1 = mod_1_1;
+            }],
+        execute: function() {
+            exports_1("t", t = mod_1.something + 1);
+        }
+    }
+});
+
+
+五、Native ECMAScript 2015 modules SimpleModule.js
+
+复制到剪切板
+import { something } from "./mod";
+export let t = something + 1;
