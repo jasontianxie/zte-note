@@ -1,0 +1,5 @@
+http://www.w3school.com.cn/media/media_mimeref.asp
+
+http分为请求行，消息报头，请求正文。
+请求正文就是body-parser要解析的内容，被解析的正文有各种格式（MIME），所以body-parser也有各种选项，比如json 、raw、url-encoded等。如果要解析客户端上传的文件，（如果文件很大，文件会被http协议分割，然后一个片段一个片段的传输，最后再进行组装，组装好了，再给其他模块使用，比如multer）可以用multer模块（http://www.expressjs.com.cn/4x/api.html#req.body）。
+multer：https://github.com/expressjs/multer/blob/master/doc/README-zh-cn.md
