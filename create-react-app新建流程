@@ -21,6 +21,8 @@ npm config set proxy http://username:password@server:port
 npm config set https-proxy http://username:passord@server:port
 说明：Username:工号（8位工号） password:人事密码  server:proxyxa.zte.com.cn  port:80
 
+删除代理：npm config delete proxy
+
 3. 修改npm资源获取路径：
 Npm默认资源路径为：
 https://registry.npmjs.org
