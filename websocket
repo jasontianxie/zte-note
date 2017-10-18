@@ -1,0 +1,71 @@
+本文使用的是这个nodejs的websocket模块：https://github.com/websockets/ws#api-docs
+
+
+一、
+websocket和express（http）可以使用相同的端口。为什么呢？
+因为websocket也是在http上实现的。比如下面的代码（https://github.com/websockets/ws#usage-examples）：
+
+server.js：
+
+const express = require('express');
+const http = require('http');
+const url = require('url');
+const WebSocket = require('ws');
+
+const app = express();
+
+app.use(function (req, res) {
+  res.send({ msg: "hello" });
+});
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', function connection(ws, req) {
+  const location = url.parse(req.url, true);
+  // You might use location.query.access_token to authenticate or share sessions
+  // or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
+
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+  });
+
+  ws.send('something');
+});
+
+server.listen(8080, function listening() {
+  console.log('Listening on %d', server.address().port);
+});
+
+
+http和websocket都是监听的8080端口。当有请求过来的时候，就会交给server.js处理，但是具体是用http处理还是websocket处理，就在server.js内部进行区分。
+
+客户端代码大概就是下面这样：
+
+var socket = new Websocket（“ws://www.example.com:8080”）;
+
+
+二、
+有多个客户端socket对象连接服务器，服务器就会新建多个与之对应的socket对象。
+var onlineUsers = new Map（）；
+wss.on('connection', function connection(ws, req) {
+    console.log(req.url);//req.url可以得到客户端使用new Websocket（‘url’）与服务器建立连接时的url。
+    console.log(getUserId(req.url));
+    ws.send(JSON.stringify(["test",{code:0,msg:"websocket login response"}]));
+    ws.on('message', function (obj) {
+        console.log(obj);
+  });
+    onlineUsers.set(userid,ws);
+});
+
+上面代码中的ws就是当一个客户端连接服务器的时候，服务器生成的一个对应的websocket。onlineUsers是一个Map结构，用来保存所有客户端的websocket，userid是给每个客户端的websocket起了一个名字。以后要使用的时候，方便用Map的get方法获取。
+
+
+三、
+服务端的ws.send方法只能发送字符串、数组、类数组的对象、buffer。如果要发送对象，则先用JSON.stringify方法转换，然后发送，否则报错。
+
+
+四、
+使用中遇到一个问题：比如同时登陆了两个用户A和B，A和B相互发送消息，正常。但是如果其中一个用户（比如A用户）退出登录（调用socket.close）再登录，B再向A发送消息则A会收到两条相同的消息，如果A第三次登录，则B向A发送的消息，A会收到三条，就是说A登录几次就会收到相同的消息几条。
+如果A不用socket.close退出登录，而是直接关闭页面，或者刷新页面，则上面的问题不会发生。
+所以现在的解决办法是用socket.close退出登录后，再用window.location.reload（）方法刷新一次页面。
