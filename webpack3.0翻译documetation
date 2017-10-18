@@ -1,0 +1,202 @@
+一、配置
+地址：https://webpack.js.org/configuration/
+
+1、module
+1.1）module.rules
+rules是一个数组，包含多个rule，每一个rule分成三个部分，他们分别是“条件-conditions”、“结果-results”、“嵌入的rules-nested Rules”。
+
+1.1.1
+conditions包括test, include, exclude 和 resource这四个字段，conditions的作用就是匹配引入的文件（require，import）。比如test，后面跟的一般是正则表达式，用来匹配文件的后缀名，一旦匹配就会应用loader来解析。 include后面跟的一般是数组，用来匹配只有在这些文件夹中的文件才会用loader来解析。resource后面跟的是一个对象，用了bool运算，当某几个条件满足的时候才会匹配。
+https://webpack.js.org/configuration/module/#condition
+
+1.1.2
+results
+包括 loader, options, use为了向前兼容也支持query loaders。results的作用就是当conditions匹配了文件，results就用loader来解析这些匹配的文件。
+
+rule
+
+rule.enforce
+指定loader的类型，默认是normal，就是正常loader，还有pre和post，表示loader是pre-loader还是post-loader。
+
+rule.onoOf
+只会匹配第一个rule
+
+useEntry
+就是rule.use中的条目，每个条目是一个对象。
+
+module.noParse
+指定哪些模块不用进行解析，提升打包性能，这些模块不能用任何的导入机制。
+
+
+
+output.crossOriginLoading
+为什么会有这个问题？https://github.com/webpack/webpack/pull/988。
+这个问题是一位开发者danez遇到的，然后他提交了pull request，然后webpack的维护者sokra接受了该PR。问题的描述是，danez打包后的js文件不是放在自己的域名服务器上，而是放在了CDN上，这时当他进行错误跟踪的时候就遇到了跨域问题。然后他提出了使用output.crossOriginLoading这个属性来支持跨域。
+
+output.devtoolFallbackModuleFilenameTemplate
+output.devtoolModuleFilenameTemplate
+这两个属性是当要请求模块名称的时候使用，详情看devtool中的quality中的without source content。通常情况下我们直接在devtool中选择一个常用的map就行了，这两个属性基本用不上。
+
+output.devtoolLineToLine
+可以生成一个简单的行内map，但是该属性已经废弃（而且有专门的devtool来设置），不推荐使用
+
+output.filename
+打包后输出的文件名，如果是单一出口，直接写文件名就行了，如果有多个出口，要使用[name] [hash] [id]等属性来分别命名输出文件。
+注意这个属性不会设置按需加载的模块的文件名，比如require.ensure生成的文件，按需加载生成的文件名用output.chunkFilename这个属性来设置。
+[name] 模块的名称，在entry属性中设置，如果entry设置为了一个对象比如entry{a：“aaa.js”，b：“bbb.js”}那么name就是a和b，如果entry不是设置的对象，比如是数组["aaa.js","bbb.js"]，那么name就是aaa和bbb
+[id] 模块的id，webpack会为每一个引入（require或import）进来的模块分配一个唯一的id
+[hash] 模块id生成的hash，默认是20位的hash，可以手动设置长度，比如[hash：16]就是16位的hash，还可以通过 output.hashDigestLength来进行全局设置，那么所有的hash都会变成这个长度
+[chunkhash] 模块内容生成的hash
+[query] entry中文件自带的查询串。比如entry{a：“aaa.js?name=123”，b：“bbb.js?page=111”},那么生成后的js文件也会带上响应的查询串。
+注意：如果使用了 ExtractTextWebpackPlugin来分离文件。那么[hash]和[chunkhash]都不会起作用，要使用[contenthash]
+
+output.hashDigest
+设置hash的编码类型，有三种可选'hex', 'latin1' or 'base64'。默认为'hex'。
+
+output.hashDigestLength
+查看output.filename中的hash的解释
+
+output.hashFunction
+设置hash的算法，默认是md5
+
+output.hashSalt
+设置更新hash，可选的
+
+output.hotUpdateChunkFilename
+热替换模块名（暂时没用过）
+
+output.hotUpdateFunction
+热替换的jsonp函数（暂时没用过）
+
+output.hotUpdateMainFilename
+热替换主文件名（暂时没用过）
+
+output.jsonpFunction
+一个jsonp函数的名字（暂时没用过）
+
+output.path
+输出文件的路径
+
+output.pathinfo
+添加注释，开发环境使用，生产环境禁止使用
+
+output.publicPath
+
+resolve
+resolve主要是用来定义如何解析引入的模块的，比如说，resolve.alias就是可以为模块的引入提供别名，resolve.extensions可以在引入模块的时候不用写后缀名。
+resolve.alias
+设置别名，当import的时候可以简化代码。
+
+resolve.aliasFields
+
+
+devtool
+https://webpack.js.org/configuration/devtool/
+1、devtool
+表中列出了所有的类型，第一栏devtool表示类型的名字，第二栏build表示首次构建的速度，+++表示非常快，++表示中等快，+表示稍快，o表示中等速度，-表示慢，--表示非常慢。第三栏rebuild表示再次构建的速度。第四栏production表示适用的环境是生产环境还是开发环境，第五栏quality表示map的质量。
+
+2、qualities
+对应于表中的第五栏，解释了各种质量是如何实现的
+2.1 bundled code
+只会生成bundle代码，不会生成map，你看不到模块之间的分离
+
+2.2 generated code
+你可以看到模块之间的分离，
+map前的代码为：
+import {test} from "module";
+map后的代码形式为：
+var module__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(42); module__WEBPACK_IMPORTED_MODULE_1__.a();
+
+2.3 transformed code
+你可以看到模块之间的分离，
+map前的代码为：
+import {test} from "module";
+map后的代码形式为：
+import {test} from "module"; var A = function(_test) { ... }(test);
+这个quality和generated code之间的区别是：
+首先生成的代码形式不同，其次是该quality在map后的代码中会同时带上map前的代码import {test} from "module";
+
+2.4original source
+你可以看到模块之间的分离，并且你可以看到transpilation前的代码
+
+2.5without source content
+map中不会包含源码，通常浏览器会通过url向服务器单独请求源码。这个时候要设置output.devtoolModuleFilenameTemplate，用来指定模块的名称，这样浏览器才知道要请求那个模块。
+也就是说这种quality类型的map，它返回给浏览器的仅仅只是一个map，并没有源码，所以就不能和源码对应起来调试，如果要对应调试某个模块，那么要单独请求这个模块，但是请求这个模块需要知道这个模块的信息才行，这个时候就可以通过output.devtoolModuleFilenameTemplate来设置。output.devtoolModuleFilenameTemplate中可以设置模块的hash，resource，id等信息。如果多个模块的名称相同就要使用output.devtoolFallbackModuleFilenameTemplate这个属性来设置。
+
+2.6lines only
+map的内容会嵌入到行内
+
+3、Development
+推荐在开发环境中使用的几种map
+
+4、Special cases
+特殊情况下使用的几种map，既不适合开发环境又不适合生产环境
+
+5、Production
+推荐在生产环境中使用的几种map
+
+
+
+external
+参考文章http://www.zhufengpeixun.com/qianduanjishuziliao/Nodejishuziliao/2017-01-17/693.html
+
+为什么要用externals呢？有的时候我们的js文件是从其他服务器下载的，比如cdn。那么这时我们不希望webpack打包该文件，但同时我们又想使用import或require等方法来使用该文件，这时就要用到externals
+
+使用方式：
+1、先在bundle之前引入该js（不仅仅是script标签的引入方式，还有其他方式，这里只是举例）
+...
+<script src="https://code.jquery.com/jquery-3.1.0.js"
+  integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="
+  crossorigin="anonymous"></script>
+...
+2、设置externals
+externals: {
+  jquery: 'jQuery'
+}
+对象左边是要在我们的开发文件中import或require的模块名，（自定义）。
+对象右边是在第1步中那个js文件导出的变量或模块名。这里是‘jQuery’
+3、在我们的开发文件中引用该模块
+import $ from 'jquery';//这里的jquery就是第2步中对象左边自定义的模块名。
+
+$('.my-element').animate(...);
+注意：上面的import并不会把jquery打包，因为jquery已经在script中引入了。
+4、在第2步中js文件导出的内容可能是一个变量，也可能是一个commonjs模块，这个时候就用下面的方法加以区分
+externals : {
+  lodash : {
+    commonjs: "lodash",
+    amd: "lodash",
+    root: "_" // indicates global variable
+  }
+}
+上面的代码说明：不管第1步中是如何引入的，最后都是lodash
+5、externals里还可以返回数组和函数，暂时没有用到
+
+
+performance
+用来提示关于性能方面的信息
+performance.hints
+是否开启提示 false，warning，error
+performance.maxEntrypointSize
+设置入口文件的最大的大小，如果超过了这个值，那么就会根据performance.hints中设置的结果来提示。
+performance.maxAssetSize
+设置资源文件的最大的大小。
+performance.assetFilter
+这个属性定义哪些资源文件需要应用performance.maxAssetSize设置的规则。
+
+
+
+node
+
+感觉此选项就是说，可以在js中使用nodejs中的模块或库
+node: {
+  console: false,
+  global: true,
+  process: true,
+  __filename: "mock",
+  __dirname: "mock",
+  Buffer: true,
+  setImmediate: true
+
+  // See "Other node core libraries" for additional options.
+}
+比如说上面的设置后，就可以在其他环境中使用nodejs中的process，buffer，__filename等了。
