@@ -39,6 +39,7 @@ v2：http://webpack.github.io/docs/webpack-dev-server.html
 10.3 InterpolateHtmlPlugin这是react-create-app自己封装的一个plugin，作用就是可以在html中使用变量，具体看react-dev-utils/interpolalteHtmlPlugin.js中的注释说明。
 10.4 WatchMissingNodeModulesPlugin这是react-create-app自己封装的一个plugin，作用是当使用npm install安装一个模块的时候，项目会自动重新构建，具体看react-dev-utils/WatchMissingNodeModulesPlugin.js中的注释说明
 10.5 eslintFormatter 这是eslint-loader的配置选项。如果编辑器中有了eslint检查，是不是就可以不用eslint-loader了？
+10.6 ModuleScopePlugin
 
 node-sass-chokidar：安装 npm install --save node-sass-chokidar
 npmjs地址：https://www.npmjs.com/package/node-sass-chokidar
