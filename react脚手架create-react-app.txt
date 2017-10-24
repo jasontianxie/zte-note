@@ -1,6 +1,6 @@
 脚手架地址：https://github.com/facebookincubator/create-react-app
 
-package.json文件
+package.json文件（没有eject前的配置）
 
 一、scripts字段：
 npm-run-all：安装 npm install --save npm-run-all
