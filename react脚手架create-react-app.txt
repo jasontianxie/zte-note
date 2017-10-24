@@ -46,6 +46,9 @@ v2：http://webpack.github.io/docs/webpack-dev-server.html
 12、 config/path
 12.1 require('url') url模块，用来解析url。
 12.2 endsWith这是es6的语法
+12.3 config.path用来返回各种文件的路径。
+13、回到config/env
+13.1 dotEnv模块的作用是将process.env中的环境变量放到.env文件中，而不是放到代码中，方便管理。详情看npm官网。
 
 node-sass-chokidar：安装 npm install --save node-sass-chokidar
 npmjs地址：https://www.npmjs.com/package/node-sass-chokidar
