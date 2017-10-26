@@ -26,6 +26,7 @@ npm-run-all：安装 npm install --save npm-run-all
 代码中的'\x1Bc' : '\x1B[2J\x1B[3J\x1B[H'是“ansi屏幕控制码”---https://en.wikipedia.org/wiki/ANSI_escape_code
 参考：http://etian4ever.blog.163.com/blog/static/27355765200962210398981/
 https://segmentfault.com/q/1010000009587005/a-1020000009640646
+https://stackoverflow.com/questions/15011478/ansi-questions-x1b25h-and-x1be
 关于stdout.write和console.log的区别
 其实console.log就是调用的stdout.write。
 https://stackoverflow.com/questions/4976466/difference-between-process-stdout-write-and-console-log-in-node-js
