@@ -22,7 +22,11 @@ npm-run-all：安装 npm install --save npm-run-all
     5.3、父进程和子进程之间的通信，参考javascript高级程序设计第三版中关于webworker的通信方式，也可以参考：http://nodejs.cn/api/child_process.html#child_process_child_send_message_sendhandle_options_callback）--》
 6、scripts--》start.js--》
 7、react-dev-utils工具包
-（7.1、clearconsole 清空控制台信息，判断操作系统平台，通过stdout.write输出来清空控制台，关于stdout.write和console.log的区别
+（7.1、clearconsole 清空控制台信息，判断操作系统平台，通过stdout.write输出来清空控制台
+代码中的'\x1Bc' : '\x1B[2J\x1B[3J\x1B[H'是“ansi屏幕控制码”---https://en.wikipedia.org/wiki/ANSI_escape_code
+参考：http://etian4ever.blog.163.com/blog/static/27355765200962210398981/
+https://segmentfault.com/q/1010000009587005/a-1020000009640646
+关于stdout.write和console.log的区别
 其实console.log就是调用的stdout.write。
 https://stackoverflow.com/questions/4976466/difference-between-process-stdout-write-and-console-log-in-node-js
 7.2、checkRequiredFiles查找文件是否存在
