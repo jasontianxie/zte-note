@@ -49,7 +49,9 @@ v2：http://webpack.github.io/docs/webpack-dev-server.html
 12.3 config.path用来返回各种文件的路径。
 13、回到config/env
 13.1 dotEnv模块的作用是将process.env中的环境变量放到.env文件中，而不是放到代码中，方便管理。详情看npm官网。
+13.2 有个这种用法[].filter(Boolean);这里的Boolean是一个类型，同时他也是一个函数，比如说String，string（3）可以吧数字3转换成字符串‘3’。这里的Boolean也是这个道理，filter里面的函数要求三个参数，但是只传一个也可以。所以上面这条语句就是说，如果数组里面的值可以转化成true就保留下来。
 https://stackoverflow.com/questions/30016773/javascript-filter-true-booleans
+13.3 
 
 node-sass-chokidar：安装 npm install --save node-sass-chokidar
 npmjs地址：https://www.npmjs.com/package/node-sass-chokidar
