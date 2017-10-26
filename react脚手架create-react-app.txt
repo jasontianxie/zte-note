@@ -22,7 +22,9 @@ npm-run-all：安装 npm install --save npm-run-all
     5.3、父进程和子进程之间的通信，参考javascript高级程序设计第三版中关于webworker的通信方式，也可以参考：http://nodejs.cn/api/child_process.html#child_process_child_send_message_sendhandle_options_callback）--》
 6、scripts--》start.js--》
 7、react-dev-utils工具包
-（7.1、clearconsole判断操作系统平台
+（7.1、clearconsole 清空控制台信息，判断操作系统平台，通过stdout.write输出来清空控制台，关于stdout.write和console.log的区别
+其实console.log就是调用的stdout.write。
+https://stackoverflow.com/questions/4976466/difference-between-process-stdout-write-and-console-log-in-node-js
 7.2、checkRequiredFiles查找文件是否存在
 7.3、choosePort--"detect-port-alt"nodejs中检测端口的工具：https://www.npmjs.com/package/detect-port-alt
 7.4、url工具、address工具等nodejs工具，很多需要用的工具都可以在npmjs上找到。
@@ -46,7 +48,7 @@ v2：http://webpack.github.io/docs/webpack-dev-server.html
 12、 config/path
 12.1 require('url') url模块，用来解析url。
 12.2 endsWith这是es6的语法
-12.3 config.path用来返回各种文件的路径。
+12.3 config/path.js用来返回各种文件的路径。
 13、回到config/env
 13.1 dotEnv模块的作用是将process.env中的环境变量放到.env文件中，而不是放到代码中，方便管理。详情看npm官网。
 13.2 有个这种用法[].filter(Boolean);这里的Boolean是一个类型，同时他也是一个函数，比如说String，string（3）可以吧数字3转换成字符串‘3’。这里的Boolean也是这个道理，filter里面的函数要求三个参数，但是只传一个也可以。所以上面这条语句就是说，如果数组里面的值可以转化成true就保留下来。
