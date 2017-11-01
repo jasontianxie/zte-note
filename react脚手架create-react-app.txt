@@ -65,7 +65,7 @@ https://stackoverflow.com/questions/30016773/javascript-filter-true-booleans
 14.1.3 inquirer 命令行工具的集合
 14.1.4 formatWebpackMessages这个是对webpack输出的信息进行格式化处理
 14.1.5 getProcessForPort 用来判断process使用的端口是否被使用过了。
-14.1.6
+14.1.6 http://www.cnblogs.com/zhaowinter/p/5661048.html
 
 node-sass-chokidar：安装 npm install --save node-sass-chokidar
 npmjs地址：https://www.npmjs.com/package/node-sass-chokidar
