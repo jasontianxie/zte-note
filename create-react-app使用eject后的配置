@@ -1,0 +1,155 @@
+npm run start
+
+1、到scripts/start.js中
+
+2、checkRequiredFiles
+这是一个函数，该函数的作用是，传递文件名数组，判断这些文件是否存在，存在返回true否则返回false。如果返回false，则process退出。
+
+2.1 fs.accessSync这个方法如果有任何可访问性检查失败则抛出错误，否则什么也不做。
+
+2.2 checkRequiredFiles接收的函数在config/paths.js中。转到config/paths.js中
+1）process.cwd() 方法返回 Node.js 进程当前工作的目录(返回相对路径，实验一下)
+
+2）fs.realpathSync 获取真实路径（绝对路径）
+
+3）path.resolve 用来解析路径。有点类似从左向右依次执行cd命令
+http://www.jianshu.com/p/78fadd20ee61
+
+4）ensureSlash这个函数用来决定路径的最后是否需要加一个斜杠。endsWith是es6的语法。
+
+5）url.parse方法，这是nodejs内部方法，不需单独安装，直接require就可以了
+var url = require('url');
+var a = url.parse('http://example.com:8080/one?a=index&t=article&m=default');
+console.log(a);
+ 
+//输出结果：
+{ 
+    protocol : 'http' ,
+    auth : null ,
+    host : 'example.com:8080' ,
+    port : '8080' ,
+    hostname : 'example.com' ,
+    hash : null ,
+    search : '?a=index&t=article&m=default',
+    query : 'a=index&t=article&m=default',
+    pathname : '/one',
+    path : '/one?a=index&t=article&m=default',
+    href : 'http://example.com:8080/one?a=index&t=article&m=default'
+}
+
+3、回到start.js中
+
+4、choosePort函数，在react-dev-utils/WebpackDevServerUtils中定义的
+这个函数接收两个参数，主机和端口。作用是判断用户使用的端口是否被占用，如果已经被占用，那么输出“哪个文件夹的哪个进程在使用该端口”
+
+4.1首先调用detect方法，这个方法为npm模块detect-port-alt
+detect-port-alt这个模块的作用是：查找端口是否可用，具体做法是，把用户传递进来的端口号和主机上的未使用的端口号进行一一比较，如果相等，则表示用户传递的端口号是空闲的，可以使用，否
+
+则说明该端口号已经被其他程序使用。
+
+4.2 is-root，检查process的运行者是不是root权限
+win32平台和其他平台下的提示信息不一样
+
+4.3 process.stdout.isTTY来判断当前是否处于TTY上下文
+
+4.4 如果是处于TTY上下文，则用clearCosole来清空控制台
+clearconsole 清空控制台信息，判断操作系统平台，通过stdout.write输出来清空控制台
+代码中的'\x1Bc' : '\x1B[2J\x1B[3J\x1B[H'是“ansi屏幕控制码”---https://en.wikipedia.org/wiki/ANSI_escape_code
+参考：http://etian4ever.blog.163.com/blog/static/27355765200962210398981/
+https://segmentfault.com/q/1010000009587005/a-1020000009640646
+https://stackoverflow.com/questions/15011478/ansi-questions-x1b25h-and-x1be
+关于stdout.write和console.log的区别
+其实console.log就是调用的stdout.write。
+https://stackoverflow.com/questions/4976466/difference-between-process-stdout-write-and-console-log-in-node-js
+
+5、 getProcessForPort函数，这个函数用来检测占用这个端口号的进程的信息
+
+5.1 getProcessIdOnPort函数
+用require('child_process').execSync创建一个子进程。它可以运行系统命令。这里运行的是lsof命令（这里列出了一些参数）。
+这里使用该命令lsof的作用是找出使用该端口的是什么进程，用于生成提示信息。
+
+5.2 getDirectoryOfProcessById函数
+这个函数同时运行了lsof命令和awk命令。这个函数的作用是列出进程号对应的目录路径。
+
+5.3 getProcessCommand函数
+这个函数使用了ps命令和sed命令
+
+6、回到choosePort函数
+
+6.1 inquirer 这个是命令行工具集合，这里用了inquirer.prompt方法来提示用户是否需要更换端口，如果要更换，直接输入端口号就行了。
+
+7、回到start.js中
+如果上面的choosePort函数检测的端口没有被使用，就会调用resolve函数来处理Port。
+
+7.1 prepareUrls函数，在react-dev-utils/WebpackDevServerUtils中定义
+这个函数用来生成各种url地址。
+
+url是nodejs内部的模块，无需单独安装，但要用require引入，url.format用来格式化一个url地址
+address是一个npm模块，需要安装，用来获取主机的各种地址，ipv4、ipv6.mac地址等。
+prepareUrls函数返回一个对象，包含四个属性：
+这四个属性，带local前缀的是表示本地地址，有可能是ip地址，也有可能是‘localHost’关键字
+带lan前缀的表示私有地址，只能是ip地址或undefined。
+
+8、回到start.js中
+
+8.1 createCompiler函数。在react-dev-utils/WebpackDevServerUtils中定义
+webpack函数接收两个参数，第一参数是配置对象，第二个参数是回调函数。根据官网中的说明https://webpack.js.org/api/node/。如果传递了回调函数，那么webpack就会自动执行，如果没有传递回
+
+调函数，那么webpack会返回一个compiler，然后通过compiler的run或者watch方法来触发webpack执行。
+在createCompiler中的处理是：如果在命令中加入了“--smoke-test”那么就会给webpack传递回调函数，否则不传递回调函数。
+
+8.2 compiler.plugin用于给事件注册回调函数，（参考官网：https://webpack.js.org/api/compiler/。和webpack自定义插件plugin）
+
+8.3 compiler.plugin监听done事件的时候，用到了stats.toJson方法。关于stats，查看官网https://webpack.js.org/api/stats/或者：https://doc.webpack-china.org/api/node/这里关于stats的说
+
+明
+
+9、formatWebpackMessages函数用来格式化webpack生成的各种信息
+
+10、回到start.js中
+createCompiler创建了一个compiler。
+
+11、prepareProxy，在react-dev-utils/WebpackDevServerUtils中定义
+用来配置dev-server的代理服务器
+
+12、createDevServerConfig
+用于生成webpack-dev-server的配置文件。
+
+13、回到start.js中
+createCompiler接收的第二个参数是webpack的配置文件。
+
+14、转到webpack.config.dev.js中
+
+14.1
+resolve字段中的plugins字段，注意这里的plugin和webpack的plugin不一样，官网中举了一个例子：DirectoryNamedWebpackPlugin。查看这个plugin的源码：
+
+https://github.com/shaketbaby/directory-named-webpack-plugin/blob/master/index.js。可以发现，apply函数接收的参数是resolver而不是compiler。实际上有了plugin的resolve是一个
+
+enhanced-resolve，可以看官网的解释：https://github.com/webpack/enhanced-resolve/。resolver.plugin注册的事件的回调函数有两个参数，request和callback。
+令人困惑的是，这里并没有说明如何写plugin和request参数是如何使用的。
+
+14.2
+eslint-loader，格式检查。里面有个formatter，可以自己写formatter函数，官网也推荐了别人写好的formatter，比如eslint-friendly-formatter
+
+14.3 file-loader和url-loader
+
+原文地址：http://blog.csdn.net/qq_38652603/article/details/73835153
+ 如果我们希望在页面引入图片（包括img的src和background的url）。当我们基于webpack进行开发时，引入图片会遇到一些问题。
+    其中一个就是引用路径的问题。拿background样式用url引入背景图来说，我们都知道，webpack最终会将各个模块打包成一个文件，因此我们样式中的url路径是相对入口html页面的，而不是相对于
+
+原始css文件所在的路径的。这就会导致图片引入失败。这个问题是用file-loader解决的，file-loader可以解析项目中的url引入（不仅限于css），根据我们的配置，将图片拷贝到相应的路径，再根据
+
+我们的配置，修改打包后文件引用路径，使之指向正确的文件。
+    另外，如果图片较多，会发很多http请求，会降低页面性能。这个问题可以通过url-loader解决。url-loader会将引入的图片编码，生成dataURl。相当于把图片数据翻译成一串字符。再把这串字符
+
+打包到文件中，最终只需要引入这个文件就能访问图片了。当然，如果图片较大，编码会消耗性能。因此url-loader提供了一个limit参数，小于limit字节的文件会被转为DataURl，大于limit的还会使
+
+用file-loader进行copy。
+    url-loader和file-loader是什么关系呢？简答地说，url-loader封装了file-loader。url-loader不依赖于file-loader，即使用url-loader时，只需要安装url-loader即可，不需要安装file-
+
+loader，因为url-loader内置了file-loader。通过上面的介绍，我们可以看到，url-loader工作分两种情况：1.文件大小小于limit参数，url-loader将会把文件转为DataURL；2.文件大小大于limit，
+
+url-loader会调用file-loader进行处理，参数也会直接传给file-loader。因此我们只需要安装url-loader即可。
+
+14.4 css module
+参考https://segmentfault.com/a/1190000008064468
