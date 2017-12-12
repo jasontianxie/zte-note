@@ -1,0 +1,82 @@
+1、配置
+参考官网的基础配置
+
+可以在svg-sprite-loader前面还加上两个loader：svg-fill-loader和svgo-loader
+
+。这两个loader的用法看各自的npm官网。
+
+
+2、在上一步的配置中有options选项。
+这些选项有以下内容：
+
+2.1、symbolId
+表示生成的symbol的id，默认是文件名。比如说文件名为myPic.svg，这个svg内部的
+
+id为aaa，那么打包过后的symbol为myPic，即文件名，使用use的使用要用这个名字
+
+。
+
+2.2、symbolRegExp
+暂时不知道如何使用
+
+2.3、esModule
+表示svg是以何种形式导出模块的，commonjs还是es6
+
+3、runtime配置
+当你引入一个svg图片的时候，loader会将这个svg转换成一个symbol标签中的内容，
+
+并且放到最终打包好的大的svg文件中。引入svg后会返回一个类的实例来表示这个
+
+svg对应的symbol。比如说：
+import twitterLogo from './logos/twitter.svg';
+使用上面的代码后，twitter.svg就会被打包到一个大的svg中的一个symbol标签中。
+
+同时返回的twitterLogo包含了这个symbol标签中的id、viewBox、和content字段。
+
+以供后面使用。比如说：
+在js代码中，你应该这样使用
+const rendered = `
+<svg viewBox="${twitterLogo.viewBox}">
+  <use xlink:href="#${twitterLogo.id}" />
+</svg>`;
+
+在html中，你应该这样使用：
+<svg>
+  <use xlink:href="#twitter"></use>
+</svg>
+
+最后打包好的大的svg文件会默认插入<body>中。
+
+3.1、后面还有一些运行时（runtime）的配置。如果没有特殊要求，可以不用配置了
+
+，使用默认配置就行。（有需求的时候再研究）
+
+
+4、提取svg的配置
+默认情况下只有在js文件中引入的svg文件（import或者require等模块引入方式）才
+
+会打包到大的svg sprite中，其他文件中使用的svg不会打包到大的svg中。比如在
+
+css中使用的svg就不会打包：
+<img back-ground:url('background.svg');
+使用了extract选项后，这些文件中的svg也会打包。
+
+默认情况下，如果不提取，那么打包过后的svg会在js文件中，提取过后就会存在一
+
+个单独的svg文件中，功能有点像extract-text-webpack-plugin。
+
+4.1、在options中将extract选项配置为true，则在css/scss/sass/less/styl/html
+
+这些文件中引用的svg文件将被提取出来，合并到一个大的svg文件中。（参考官网给
+
+出的例子：最终打包好的文件在build文件夹中：
+
+https://github.com/kisenka/svg-sprite-
+
+loader/blob/b9db519a834a9d1889a02759a2acc7b6b653358a/examples/extract-
+
+mode/webpack.config.js）
+
+4.2、可以用spriteFilename来设置提取出来的svg文件的文件名，如果不设置，默认
+
+为sprite.svg。
