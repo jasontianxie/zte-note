@@ -1,0 +1,15 @@
+redux处理异步请求除了使用redux-thunk、redux-promise还流行另一个中间件redux-saga（https://www.jianshu.com/p/e84493c7af35）
+
+
+设计模式
+https://www.cnblogs.com/tugenhua0707/p/5198407.html#_labelTop
+
+行为模式
+https://www.cnblogs.com/doit8791/archive/2012/05/08/2490989.html
+
+同源策略和跨域
+https://www.zhihu.com/question/20138568/answer/18955363
+
+拼音
+http://www.jb51.net/article/90842.htm
+http://www.cnblogs.com/BBYY/p/5703135.html
